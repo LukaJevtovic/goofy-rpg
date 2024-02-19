@@ -1,0 +1,1 @@
+Very simple and probably extremely unoptimized rpg game made using pygame (and numpy). You can find .zip files with prepackaged executable files for both windows and linux, made with pyinstaller. These you can run or send to someone even if they don't have python or any of its libraries.
