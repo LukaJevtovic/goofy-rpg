@@ -86,6 +86,7 @@ class Shield():
         self.name = name
     
 
+shortsword = Weapon('Shortsword', True, 0, 'd6')
 longsword = Weapon('Longsword',True, 0, 'd8')
 longbow = Weapon('Longbow', False, 0, 'd8')
 firebolt = Weapon('Firebolt', False, 0, 'd10')

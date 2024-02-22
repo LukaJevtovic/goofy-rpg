@@ -47,6 +47,6 @@ class basic_enemy():
         return dead
     
 
-goblin = basic_enemy(7, 15, 8, 14, 10, 10, 8, 8, equipment.longsword, 4, 2)
+goblin = basic_enemy(7, 15, 8, 14, 10, 10, 8, 8, equipment.shortsword, 4, 2)
 
             

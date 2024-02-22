@@ -49,6 +49,10 @@ cha_down = button.Button(200, 600, minus_img, 0.5)
 race_button = button.ButtonSlow(750, 710, race_img, 0.3)
 back_button = button.ButtonSlow(20, 710, back_img, 0.3)
 
+orc_selected = False
+elf_selected = False
+human_selected = False
+
 #RACE SELECT --------------------------------------------------------------------------------------------------------------
 
 #Images
@@ -175,6 +179,9 @@ wizard_selected = False
 while run:
 
 #START MENU --------------------------------------------------------------------------------------------------------------
+    
+    pygame.mixer.music.load('Sounds/character_bg.mp3')
+    pygame.mixer.music.play(-1)
 
     while start_menu and run:
 
@@ -256,7 +263,7 @@ while run:
                 orc_selected = False
                 elf_selected = False
                 human_selected = False
-
+                
 
         #Pause Menu
         if game_paused:
@@ -304,7 +311,7 @@ while run:
             functions.draw_stats(STATS, stat_modifier, stat_font, text_col, 50, 80, 20, screen)
 
             #Races
-            if orc_selected==False and elf_selected==False and human_selected==False and disable_click==False:
+            if orc_selected==False and elf_selected==False and human_selected==False:
                 if orc_button.draw(screen):
                     orc_selected=True
                     STATS[0]+=2
@@ -376,6 +383,7 @@ while run:
             if back_button.draw(screen):
                 race_select = False
                 stat_select = True
+                STATS = STATS_INIT[:]
             
             if class_button.draw(screen):
                 class_select = True
@@ -606,16 +614,23 @@ while run:
         clock.tick(60)
 
 
+# -----------------------------------------------------------------------------------------------------------------------
 #CHAPTER 1 --------------------------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------------------
         
+    pygame.mixer.music.stop()
+    pygame.mixer.music.load('Sounds/adventure_bg.mp3')
+    pygame.mixer.music.play(-1)
     while adventure1 and run:
 
         screen.fill((156, 115, 3))
 
 
         if not game_paused:
-            functions.text_wrap('You wake up from a receding nightmare. Heart pounding, you jolt upwards, then relax, realizing you\'re alone. Alone... in the middle of the woods? This isn\'t right. No, not right at all. You look around for any sign of life, yet it seems that you, and your meager adventuring equipment, are all the company you have. Suddenly, you see something small and green, rustle the leaves of the nearby bushes. A goblin! What do you do?',
+            functions.text_wrap('You wake up from a receding nightmare. Heart pounding, you jolt upwards, then relax, realizing you\'re alone. Alone... in the middle of the woods? This isn\'t right. No, not right at all. You look around for any sign of life, yet it seems that you, and your meager adventuring equipment, are all the company you have. Suddenly, you see something small and green, rustle the leaves of the nearby bushes. A goblin!',
                                 stat_font, text_col, screen, 20, 20, SCREEN_WIDTH-40)
+            functions.text_wrap('You wake up from a receding nightmare. Heart pounding, you jolt upwards, then relax, realizing you\'re alone. Alone... in the middle of the woods? This isn\'t right. No, not right at all. You look around for any sign of life, yet it seems that you, and your meager adventuring equipment, are all the company you have. Suddenly, you see something small and green, rustle the leaves of the nearby bushes. A goblin!',
+                                stat_font, text_col, screen, 20, 140, SCREEN_WIDTH-40)
 
         if fight_button1.draw(screen):
             adventure1 = False
