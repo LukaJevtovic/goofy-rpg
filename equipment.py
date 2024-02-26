@@ -1,4 +1,7 @@
 import numpy as np
+import functions
+
+stat_modifier = {1:'-5', 2:'-4', 3:'-4', 4:'-3', 5:'-3', 6:'-2', 7:'-2', 8:'-1', 9:'-1', 10:'+0', 11:'+0', 12:'+1', 13:'+1', 14:'+2', 15:'+2', 16:'+3', 17:'+3', 18:'+4', 19:'+4', 20:'+5', 21:'+5', 22:'+6', 23:'+6', 24:'+7', 25:'+7'}
 
 def dice(die_type):
 
@@ -8,15 +11,17 @@ def dice(die_type):
         return 1, 7
     elif die_type == 'd8':
         return 1,9
+    elif die_type == 'd10':
+        return 1,11
     elif die_type == 'd12':
         return 1, 13
     elif die_type == 'd20':
         return 1, 21
 
 class Weapon():
-    def __init__(self, name, melee, enchanted, damage_die):
+    def __init__(self, name, stat, enchanted, damage_die):
         self.name = name
-        self.melee = melee
+        self.stat = stat
         self.enchanted = enchanted
         self.damage_die = damage_die
         if self.enchanted != 0:
@@ -24,35 +29,23 @@ class Weapon():
         else:
             self.enchantment = 0
 
-    def attack_roll(self, atk_bonus, threatened):
+    def attack_roll(self, creature, advantage=False, disadvantage=False):
 
-        if self.melee:
-            if threatened:
-                atk_dice = np.random.randint(1,21)
-                if atk_dice == 20:
-                    crit = True
-                else:
-                    crit = False
-                return atk_dice + self.enchantment + atk_bonus, crit
-            else:
-                return 0
-        if not self.melee:
-            if threatened:
-                atk_dice = min(np.random.randint(1,21), np.random.randint(1,21))
-                if atk_dice == 20:
-                    crit = True
-                else:
-                    crit = False
-                return atk_dice + self.enchantment + atk_bonus, crit
-            else:
-                atk_dice = np.random.randint(1,21)
-                if atk_dice == 20:
-                    crit = True
-                else:
-                    crit = False
-                return atk_dice + self.enchantment + atk_bonus, crit
+        atk_bonus = int(stat_modifier[getattr(creature, self.stat, None)]) + creature.proficiency_bonus()
+        
+        
+        atk_dice = functions.d20(advantage, disadvantage)
+
+        if atk_dice == 20:
+            crit = True
+        else:
+            crit = False
+        return atk_dice + self.enchantment + atk_bonus, crit
             
-    def damage_roll(self, dmg_bonus, crit):
+
+    def damage_roll(self, creature, crit):
+        dmg_bonus = int(stat_modifier[getattr(creature, self.stat, None)])
+
         minimum, maximum = dice(self.damage_die)
         if crit:
             damage = 2*np.random.randint(minimum, maximum) + dmg_bonus + self.enchantment
@@ -84,15 +77,20 @@ class Armor():
 class Shield():
     def __init__(self, name):
         self.name = name
-    
 
-shortsword = Weapon('Shortsword', True, 0, 'd6')
-longsword = Weapon('Longsword',True, 0, 'd8')
-longbow = Weapon('Longbow', False, 0, 'd8')
-firebolt = Weapon('Firebolt', False, 0, 'd10')
+class Item():
+    def __init__(self, name):
+        self.name = name
+    
+shortsword = Weapon('Shortsword', 'dex', 0, 'd6')
+longsword = Weapon('Longsword', 'str', 0, 'd8')
+longbow = Weapon('Longbow', 'dex', 0, 'd8')
+firebolt = Weapon('Firebolt', 'int', 0, 'd10')
 
 robes = Armor('Clothes', 'Light', 10, True)
 breastplate = Armor('Breastplate', 'Medium', 14, True)
 full_plate = Armor('Full Plate', 'Heavy', 18, False)
 
 shield = Shield('Shield')
+
+gold_pouch = Item('50 gold')

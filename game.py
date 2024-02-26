@@ -4,6 +4,8 @@ import button
 import functions
 import equipment
 import creatures
+import encounters
+import dungeons
 pygame.init()
 
 #Screen setup
@@ -120,11 +122,18 @@ adventure_button = button.ButtonSlow(710, 690, adventure_img, 0.25)
 
 #Images
 fight_img = pygame.image.load('Pictures/fight.png').convert_alpha()
+dungeon_img = pygame.image.load('Pictures/dungeon.png').convert_alpha()
 
 #Buttons
 fight_button1 = button.ButtonSlow(40, 650, fight_img, 0.3)
 fight_button2 = button.ButtonSlow(340, 650, fight_img, 0.3)
 fight_button3 = button.ButtonSlow(640, 650, fight_img, 0.3)
+dungeon_button = button.ButtonSlow(340, 650, dungeon_img, 0.3)
+
+
+# DUNGEONS --------------------------------------------------------------------------------------------------------------
+DUNGEON_IMGS = [pygame.image.load('Dungeons/intro_dungeon.jpg').convert_alpha()]
+DUNGEONS = [dungeons.Dungeon(DUNGEON_IMGS[0], 620, 400, 0.25, dungeons.DUNGEON_POSITIONS[0])]
 
 
 #variables
@@ -163,14 +172,13 @@ start_menu = True
 run = True
 
 adventure1 = False
-combat1 = False
+dungeon1 = False
+dungeon2 = False
 
 #variables
-STATS = [8,8,8,8,8,8]
 
-player = creatures.Player(0,0,8,8,8,8,8,8)
 
-points = 27
+
 fighter_selected = False
 wizard_selected = False
 
@@ -180,10 +188,15 @@ while run:
 
 #START MENU --------------------------------------------------------------------------------------------------------------
     
-    pygame.mixer.music.load('Sounds/character_bg.mp3')
-    pygame.mixer.music.play(-1)
+
 
     while start_menu and run:
+        pygame.mixer.music.load('Sounds/character_bg.mp3')
+        pygame.mixer.music.play(-1)
+
+        STATS = [8,8,8,8,8,8]
+        player = creatures.Player(1, 0, 10, 8, 8, 8, 8, 8, 8, [])
+        points = 27
 
         screen.fill((156, 115, 3))
 
@@ -618,9 +631,17 @@ while run:
 #CHAPTER 1 --------------------------------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------
         
-    pygame.mixer.music.stop()
-    pygame.mixer.music.load('Sounds/adventure_bg.mp3')
-    pygame.mixer.music.play(-1)
+    if adventure1:
+
+        player.str, player.dex, player.con, player.int, player.wis, player.cha = STATS
+        player.equipment = P_EQUIPMENT
+        player.hp += int(stat_modifier[player.con])
+        
+        pygame.mixer.music.stop()
+        pygame.mixer.music.load('Sounds/adventure_bg.mp3')
+        pygame.mixer.music.set_volume(0.8)
+        pygame.mixer.music.play(-1)
+
     while adventure1 and run:
 
         screen.fill((156, 115, 3))
@@ -629,18 +650,66 @@ while run:
         if not game_paused:
             functions.text_wrap('You wake up from a receding nightmare. Heart pounding, you jolt upwards, then relax, realizing you\'re alone. Alone... in the middle of the woods? This isn\'t right. No, not right at all. You look around for any sign of life, yet it seems that you, and your meager adventuring equipment, are all the company you have. Suddenly, you see something small and green, rustle the leaves of the nearby bushes. A goblin!',
                                 stat_font, text_col, screen, 20, 20, SCREEN_WIDTH-40)
-            functions.text_wrap('You wake up from a receding nightmare. Heart pounding, you jolt upwards, then relax, realizing you\'re alone. Alone... in the middle of the woods? This isn\'t right. No, not right at all. You look around for any sign of life, yet it seems that you, and your meager adventuring equipment, are all the company you have. Suddenly, you see something small and green, rustle the leaves of the nearby bushes. A goblin!',
+            functions.text_wrap('It didn\'t seem to have noticed you, so you take this opportunity and follow it silently through the woods. Hoping, perhaps, that wherever this devious little creature is headed is going to hold the answers that you seek. After a short while, the goblin disappears into a small cave opening. Curious, you decide to take a peek inside.',
                                 stat_font, text_col, screen, 20, 140, SCREEN_WIDTH-40)
 
-        if fight_button1.draw(screen):
+        if dungeon_button.draw(screen):
             adventure1 = False
-            combat1 = True
-        if fight_button2.draw(screen):
-            adventure1 = False
-            combat1 = True
-        if fight_button3.draw(screen):
-            adventure1 = False
-            combat1 = True
+            dungeon1 = True
+
+        #Pause Menu
+        if game_paused:
+            functions.draw_text("Game is paused. Press ESC to unpause.", font, text_col, 100, 30, screen)
+            if resume_button.draw(screen):
+                game_paused = False
+            if quit_button.draw(screen):
+                run = False
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        game_paused = False
+                if event.type == pygame.QUIT:
+                    run = False
+        
+        for event in pygame.event.get():
+
+            #Pause check
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    game_paused = True
+            #Quit check
+            if event.type == pygame.QUIT:
+                run = False
+
+        pygame.display.update()
+        clock.tick(60)
+        
+    
+    while dungeon1 and run:
+
+        screen.fill((156, 115, 3))
+
+        if not player.alive:
+            dungeon1 = False
+            start_menu = True
+
+
+        #Player info
+        #functions.draw_stats(STATS, stat_modifier, stat_font, text_col, 50, 80, 20, screen)
+        functions.draw_text('Health: ' + str(player.hp), font, text_col, 50, 230, screen)
+        functions.draw_text('AC: ' + str(player.ac), font, text_col, 50, 260, screen)
+        functions.draw_text('Current equipment:', stat_font, text_col, 50, 300, screen)
+        dy = 20
+        for i in range(len(player.equipment)):
+            functions.draw_text(player.equipment[i].name, stat_font, text_col, 50, 320 + i*dy, screen)
+
+        #functions.combat(player, [creatures.goblin], screen, stat_font, text_col, font, clock)
+
+        if DUNGEONS[0].draw(screen, player, stat_font, text_col, font, clock):
+            pygame.time.wait(2000)
+            dungeon2 = True
+            dungeon1 = False
+
 
         #Pause Menu
         if game_paused:
@@ -669,25 +738,12 @@ while run:
         pygame.display.update()
         clock.tick(60)
 
-    while combat1 and run:
 
+    while dungeon2 and run:
         screen.fill((156, 115, 3))
-        functions.draw_text('Work in Progress', font, text_col, 200, 200, screen)
 
-        #Pause Menu
-        if game_paused:
-            functions.draw_text("Game is paused. Press ESC to unpause.", font, text_col, 100, 30, screen)
-            if resume_button.draw(screen):
-                game_paused = False
-            if quit_button.draw(screen):
-                run = False
-            for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        game_paused = False
-                if event.type == pygame.QUIT:
-                    run = False
-        
+        functions.draw_text('Work in progress', font, text_col, 100, 100, screen)
+
         for event in pygame.event.get():
 
             #Pause check
