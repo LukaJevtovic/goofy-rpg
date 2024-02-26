@@ -4,19 +4,13 @@ I'm aiming to build a "roguelike dnd" at some point, with randomly selected dung
 
 INSTALLATION:
 
-1. Windows
-Download and extract the game_win.zip file. Run game.exe. This was created using pyinstaller on Windows 11, within the Anaconda environment. Windows defender will probably warn you that you're running an app from an unrecognized publisher. I can give you no more than my honest promise that there isn't anything malicious in my game :)
-If you believe me, click More Info, and then Run Anyway to start the game.
+1.1 Windows: Download and extract the game_win.zip file. Run game.exe. This was created using pyinstaller on Windows 11, within the Anaconda environment. Windows defender will probably warn you that you're running an app from an unrecognized publisher. I can give you no more than my honest promise that there isn't anything malicious in my game :) If you believe me, click More Info, and then Run Anyway to start the game. At some point I might come back to this and try to make an installer that won't cause this issue with Windows Defender.
 
-At some point I might come back to this and try to make an installer that won't cause this issue with Windows Defender.
+1.2 Windows: Alternatively, clone this repository, and make sure you have python, pygame and numpy installed, alongiside any python IDE (VSCode or whatever). Compile game.py within your IDE and enjoy the game.
 
-Alternatively, clone this repository, and make sure you have python, pygame and numpy installed, alongiside any python IDE (VSCode or whatever). Compile game.py within your IDE and enjoy the game.
+2.1 Ubuntu-based Linux distros: Download and extract the game_linux.zip file. This was created using pyinstaller on Pop!-OS, which is a Ubuntu-based distro. This means that it should work on any other Ubuntu-based distro, although I haven't tested it outside pop-os. If you try it out on a different distro, feel free to let me know if it worked or not. Run the 'game' executable.
 
-2. Ubuntu-based Linux distros
-Download and extract the game_linux.zip file. This was created using pyinstaller on Pop!-OS, which is a Ubuntu-based distro. This means that it should work on any other Ubuntu-based distro, although I haven't tested it outside pop-os. If you try it out on a different distro, feel free to let me know if it worked or not.
-Run the 'game' executable.
-
-Alternatively, make sure you have the latest versions of python, pygame and numpy installed, then clone the entire repository and compile game.py (either directly from terminal using python3, or from an IDE).
+2.2 Ubuntu-based Linux distros: Alternatively, make sure you have the latest versions of python, pygame and numpy installed, then clone the entire repository and compile game.py (either directly from terminal using python3, or from an IDE).
 
 CREDITS:
 
