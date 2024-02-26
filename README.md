@@ -4,5 +4,8 @@ I'm aiming to build a "roguelike dnd" at some point, with randomly selected dung
 
 CREDITS:
 
+Game Mechanics:
+The basis of this game is currently a slightly modified version of fifth edition rules for Dungeons and Dragons, by Wizards of the Coast. Legally I am obliged to include their Open Gaming License, which you can find in the main repository, named 'SRD-OGL_v5.1.pdf'. I plan to further modify and adapt the basic DnD rules for the purposes of the game in the future.
+
 Music and SFX:
 Music during adventure - created by ZHRØ on Freesound (https://freesound.org/people/ZHR%C3%98/sounds/527321/)
