@@ -146,7 +146,7 @@ arrows = 0
 #additional objects setup
 font = pygame.font.SysFont(None,40)
 stat_font = pygame.font.SysFont(None, 30)
-text_col = (255,255,255)
+text_col = (0,0,0)
 
 """
 #Function to draw text on screen
@@ -198,7 +198,7 @@ while run:
         player = creatures.Player(1, 0, 10, 8, 8, 8, 8, 8, 8, [])
         points = 27
 
-        screen.fill((156, 115, 3))
+        screen.fill((229,203,186))
 
         if start_button.draw(screen):
             stat_select = True
@@ -218,7 +218,7 @@ while run:
 
     while stat_select and run:
 
-        screen.fill((156, 115, 3))
+        screen.fill((229,203,186))
 
         #Game Started
         if not game_paused:
@@ -311,7 +311,7 @@ while run:
 
     while race_select and run:
 
-        screen.fill((156, 115, 3))
+        screen.fill((229,203,186))
 
         if not game_paused:
 
@@ -435,7 +435,7 @@ while run:
         
     while class_select and run:
 
-        screen.fill((156, 115, 3))
+        screen.fill((229,203,186))
 
         if not game_paused:
 
@@ -517,7 +517,7 @@ while run:
 
     while equipment_select and run:
 
-        screen.fill((156, 115, 3))
+        screen.fill((229,203,186))
 
         if not game_paused:
             if len(P_EQUIPMENT) == 0:
@@ -636,6 +636,7 @@ while run:
         player.str, player.dex, player.con, player.int, player.wis, player.cha = STATS
         player.equipment = P_EQUIPMENT
         player.hp += int(stat_modifier[player.con])
+        player.max_hp = player.hp
         
         pygame.mixer.music.stop()
         pygame.mixer.music.load('Sounds/adventure_bg.mp3')
@@ -644,7 +645,7 @@ while run:
 
     while adventure1 and run:
 
-        screen.fill((156, 115, 3))
+        screen.fill((229,203,186))
 
 
         if not game_paused:
@@ -687,7 +688,7 @@ while run:
     
     while dungeon1 and run:
 
-        screen.fill((156, 115, 3))
+        screen.fill((229,203,186))
 
         if not player.alive:
             dungeon1 = False
@@ -705,7 +706,7 @@ while run:
 
         #functions.combat(player, [creatures.goblin], screen, stat_font, text_col, font, clock)
 
-        if DUNGEONS[0].draw(screen, player, stat_font, text_col, font, clock):
+        if DUNGEONS[0].draw(screen, player, stat_font, text_col, font, clock) and player.alive:
             pygame.time.wait(2000)
             dungeon2 = True
             dungeon1 = False
@@ -740,7 +741,7 @@ while run:
 
 
     while dungeon2 and run:
-        screen.fill((156, 115, 3))
+        screen.fill((229,203,186))
 
         functions.draw_text('Work in progress', font, text_col, 100, 100, screen)
 

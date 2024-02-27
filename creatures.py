@@ -7,7 +7,7 @@ class Player():
     def __init__(self, lvl, hp, AC, str, dex, con, int, wis, cha, P_EQUIPMENT):
         self.name = 'Player'
         self.lvl = lvl
-        self.total_health = hp
+        self.max_hp = hp
         self.ac = AC
         self.str = str
         self.dex = dex
@@ -15,7 +15,7 @@ class Player():
         self.int = int
         self.wis = wis
         self.cha = cha
-        self.hp = self.total_health
+        self.hp = self.max_hp
         self.equipment = P_EQUIPMENT
         self.alive = True
 
@@ -56,7 +56,7 @@ class Player():
 class basic_enemy():
     def __init__(self, name, hp, AC, str, dex, con, int, wis, cha, weapon, proficiency):
         self.name = name
-        self.total_health = hp
+        self.max_hp = hp
         self.ac = AC
         self.str = str
         self.dex = dex
@@ -64,7 +64,7 @@ class basic_enemy():
         self.int = int
         self.wis = wis
         self.cha = cha
-        self.hp = self.total_health
+        self.hp = self.max_hp
         self.proficiency = proficiency
         self.weapon = weapon
         self.alive = True

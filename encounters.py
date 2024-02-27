@@ -169,7 +169,7 @@ class event_regular():
                 quitting = True
 
 
-        screen.fill((156, 115, 3))
+        screen.fill((229,203,186))
 
         functions.draw_text('You find a lost pouch of gold! (Work in progress)', font, text_col, 100, 100, screen)
         player.equipment.append(equipment.gold_pouch)
@@ -179,4 +179,5 @@ class event_regular():
 
 COMBAT1 = [[creatures.basic_enemy(*creatures.goblin_stats)]]
 
-COMBAT_BOSS = [[creatures.basic_enemy(*creatures.goblin_stats), creatures.basic_enemy(*creatures.goblin_stats)]]
+COMBAT_BOSS = [[creatures.basic_enemy(*creatures.goblin_stats), creatures.basic_enemy(*creatures.goblin_stats), creatures.basic_enemy(*creatures.goblin_stats)]]
+

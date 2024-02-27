@@ -7,7 +7,13 @@ stat_modifier = {1:'-5', 2:'-4', 3:'-4', 4:'-3', 5:'-3', 6:'-2', 7:'-2', 8:'-1',
 #Function to draw text on screen
 def draw_text(text, font, color, x, y, screen):
     img = font.render(text, True, color)
+    width = img.get_width()
     screen.blit(img, (x,y))
+    return width
+
+
+
+
 
 def draw_stats(STATS, stat_modifier, font, color, x, y, dy, screen):
     draw_text('Strength: ' + str(STATS[0]) + ' (' + stat_modifier[STATS[0]] + ')', font, color, x, y, screen)
@@ -16,7 +22,6 @@ def draw_stats(STATS, stat_modifier, font, color, x, y, dy, screen):
     draw_text('Intelligence: ' + str(STATS[3]) + ' (' + stat_modifier[STATS[3]] + ')', font, color, x, y+(3*dy), screen)
     draw_text('Wisdom: ' + str(STATS[4]) + ' (' + stat_modifier[STATS[4]] + ')', font, color, x, y+(4*dy), screen)
     draw_text('Charisma: ' + str(STATS[5]) + ' (' + stat_modifier[STATS[5]] + ')', font, color, x, y+(5*dy), screen)
-
 
 def text_wrap(text, font, color, surface, x, y, max_width):
     words = text.split(' ')
@@ -38,15 +43,12 @@ def text_wrap(text, font, color, surface, x, y, max_width):
         surface.blit(text_surface, text_rect)
         y_offset += font.size(line)[1]
 
-
-
 def dice_sound():
     i = np.random.randint(1,7)
     sound_name = 'Sounds/dice_roll_' + str(i) + '.wav'
     dice_roll_sound = pygame.mixer.Sound(sound_name)
     dice_roll_sound.set_volume(1.4)
     dice_roll_sound.play()
-
 
 def d20(disadvantage=False, advantage=False):
     if (disadvantage and advantage) or (not disadvantage and not advantage):
@@ -56,8 +58,6 @@ def d20(disadvantage=False, advantage=False):
     elif advantage:
         number = max([np.random.randint(1,21), np.random.randint(1,21)])
     return number
-
-
 
 def combat(player, ENEMIES, screen, stat_font, text_col, font, clock):
 
@@ -95,33 +95,86 @@ def combat(player, ENEMIES, screen, stat_font, text_col, font, clock):
                 quitting = True
 
 
-        screen.fill((156, 115, 3))
-        draw_text('Health: ' + str(player.hp), font, text_col, 50, 230, screen)
+        screen.fill((229,203,186))
+        #draw_text('Health: ' + str(player.hp), font, text_col, 50, 230, screen)
         
+        health_bar(player, 20, 20, 0, (255,255,255), screen)
         dy = 30
 
         #Initiative order print
         i=0
         while i<len(sorted_initiatives):
             if i == 0:
-                draw_text('Taking turn: ' + sorted_initiatives[i][1].name, font, text_col, 500, 80, screen)
+                width = draw_text('Taking turn: ' + sorted_initiatives[i][1].name, font, text_col, 500, 80, screen)
+                if not sorted_initiatives[i][1].name == 'Player':
+                    health_bar(sorted_initiatives[i][1], 500 + width, 77, 1, (255,255,255), screen)
                 draw_text('Up next:', font, text_col, 500, 110, screen)
                 
             else:
-                draw_text(sorted_initiatives[i][1].name + ' ' + str(sorted_initiatives[i][1].hp) + 'hp', stat_font, text_col, 620, 115 + (i-1)*dy, screen)
+                width = draw_text(sorted_initiatives[i][1].name, stat_font, text_col, 620, 115 + (i-1)*dy, screen)
+
+                if not sorted_initiatives[i][1].name == 'Player':
+                    health_bar(sorted_initiatives[i][1], 625 + width, 112 + (i-1)*dy, 1, (255,255,255), screen)
                 
             i+=1
 
         #Player turn
+        selected_enemy = -1
+
         
         if sorted_initiatives[0][1].name == player.name:
+
+            while selected_enemy == -1 and not quitting:
+
+                for event in pygame.event.get():
+
+                    #Pause check
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_1:
+                            selected_enemy = 1
+                        elif event.key == pygame.K_2:
+                            if len(sorted_initiatives)>2:
+                                selected_enemy = 2
+                        elif event.key == pygame.K_3:
+                            if len(sorted_initiatives)>3:
+                                selected_enemy = 3
+                    #Quit check
+                    if event.type == pygame.QUIT:
+                        run = False
+                        quitting = True
+
+                screen.fill((229,203,186))
+                #draw_text('Health: ' + str(player.hp), font, text_col, 50, 230, screen)
+                
+                health_bar(player, 20, 20, 0, (255,255,255), screen)
+                dy = 30
+
+                #Initiative order print
+                i=0
+                while i<len(sorted_initiatives):
+                    if i == 0:
+                        width = draw_text('Taking turn: ' + sorted_initiatives[i][1].name, font, text_col, 500, 80, screen)
+                        if not sorted_initiatives[i][1].name == 'Player':
+                            health_bar(sorted_initiatives[i][1], 500 + width, 77, 1, (255,255,255), screen)
+                        draw_text('Up next:', font, text_col, 500, 110, screen)
+                        
+                    else:
+                        width = draw_text(sorted_initiatives[i][1].name, stat_font, text_col, 620, 115 + (i-1)*dy, screen)
+
+                        if not sorted_initiatives[i][1].name == 'Player':
+                            health_bar(sorted_initiatives[i][1], 625 + width, 112 + (i-1)*dy, 1, (255,255,255), screen)
+                        
+                    i+=1
+
+                draw_text('Select enemy to attack! [Buttons 1-' + str(len(sorted_initiatives)-1) + ']', font, text_col, 200, 500, screen)
+
+                pygame.display.update()
+                clock.tick(60)
+                        
             
 
-
-            if attack_button.draw(screen):
-                #TODO: Add input for selecting one of multiple enemies with output index selected_enemy
+            if selected_enemy != -1:
                 #TODO: Add option for selecting a weapon/spell from inventory to use in the attack
-                selected_enemy = 1
                 selected_weapon = 0
 
                 #draw_text('Attack roll:     vs.' + str(sorted_initiatives[selected_enemy][1].ac) + 'AC', font, text_col, 100, 30, screen)
@@ -132,30 +185,30 @@ def combat(player, ENEMIES, screen, stat_font, text_col, font, clock):
 
                 if attack_roll >= sorted_initiatives[selected_enemy][1].ac:
 
-                    draw_text('Attack roll: ' + str(attack_roll) + ' vs. ' + str(sorted_initiatives[selected_enemy][1].ac) + 'AC', font, text_col, 100, 30, screen)
-                    draw_text('Success!', font, text_col, 100, 60, screen)
+                    draw_text('Attack roll: ' + str(attack_roll) + ' vs. ' + str(sorted_initiatives[selected_enemy][1].ac) + 'AC', font, text_col, 300, 300, screen)
+                    draw_text('Success!', font, text_col, 300, 330, screen)
                     pygame.display.update()
                     pygame.time.wait(2500)
 
                     damage = WEAPONS[selected_weapon].damage_roll(player, crit)
                     dice_sound()
-                    draw_text(str(sorted_initiatives[selected_enemy][1].name) + ' takes ' + str(damage) + ' damage!', font, text_col, 100, 90, screen)
+                    draw_text(str(sorted_initiatives[selected_enemy][1].name) + ' takes ' + str(damage) + ' damage!', font, text_col, 300, 360, screen)
                     sorted_initiatives[selected_enemy][1].take_damage(damage)
 
                     if sorted_initiatives[selected_enemy][1].alive:
-                        draw_text(str(sorted_initiatives[selected_enemy][1].name) + ' has ' + str(sorted_initiatives[selected_enemy][1].hp) + ' left', font, text_col, 100, 120, screen)
+                        draw_text(str(sorted_initiatives[selected_enemy][1].name) + ' has ' + str(sorted_initiatives[selected_enemy][1].hp) + ' left', font, text_col, 300, 390, screen)
                         pygame.display.update()
                         pygame.time.wait(2500)
                         
                     else:
-                        draw_text(str(sorted_initiatives[selected_enemy][1].name) + ' falls!', font, text_col, 100, 120, screen)
+                        draw_text(str(sorted_initiatives[selected_enemy][1].name) + ' falls!', font, text_col, 300, 390, screen)
                         pygame.display.update()
                         pygame.time.wait(2500)
                         sorted_initiatives.pop(selected_enemy)
 
                 else:
-                    draw_text('Attack roll: ' + str(attack_roll) + ' vs. ' + str(sorted_initiatives[selected_enemy][1].ac) + 'AC', font, text_col, 100, 30, screen)
-                    draw_text('You miss!',font, text_col, 100, 60, screen)
+                    draw_text('Attack roll: ' + str(attack_roll) + ' vs. ' + str(sorted_initiatives[selected_enemy][1].ac) + 'AC', font, text_col, 300, 300, screen)
+                    draw_text('You miss!',font, text_col, 300, 330, screen)
                     pygame.display.update()
                     pygame.time.wait(2500)
                 
@@ -178,29 +231,29 @@ def combat(player, ENEMIES, screen, stat_font, text_col, font, clock):
 
             if attack_roll >= player.ac:
 
-                draw_text('Attack roll: ' + str(attack_roll) + ' vs. ' + str(player.ac) + 'AC', font, text_col, 100, 30, screen)
-                draw_text(enemy.name + ' hits you!', font, text_col, 100, 60, screen)
+                draw_text('Attack roll: ' + str(attack_roll) + ' vs. ' + str(player.ac) + 'AC', font, text_col, 300, 300, screen)
+                draw_text(enemy.name + ' hits you!', font, text_col, 300, 330, screen)
                 pygame.display.update()
                 pygame.time.wait(2500)
 
                 damage = enemy.weapon.damage_roll(enemy, crit)
                 dice_sound()
-                draw_text(enemy.name + ' deals ' + str(damage) + ' damage!', font, text_col, 100, 90, screen)
+                draw_text(enemy.name + ' deals ' + str(damage) + ' damage!', font, text_col, 300, 360, screen)
                 player.take_damage(damage)
 
                 if player.alive:
-                    draw_text('You withstand the attack!', font, text_col, 100, 120, screen)
+                    draw_text('You withstand the attack!', font, text_col, 300, 390, screen)
                     pygame.display.update()
                     pygame.time.wait(2500)
                     
                 else:
-                    draw_text('YOU DIED!', font, text_col, 100, 120, screen)
+                    draw_text('YOU DIED!', font, text_col, 300, 390, screen)
                     pygame.display.update()
                     pygame.time.wait(2500)
 
             else:
-                draw_text('Attack roll: ' + str(attack_roll) +     ' vs.' + str(player.ac) + 'AC', font, text_col, 100, 30, screen)
-                draw_text(enemy.name + ' missed you!',font, text_col, 100, 60, screen)
+                draw_text('Attack roll: ' + str(attack_roll) +     ' vs.' + str(player.ac) + 'AC', font, text_col, 300, 300, screen)
+                draw_text(enemy.name + ' missed you!',font, text_col, 300, 330, screen)
                 pygame.display.update()
                 pygame.time.wait(2500)
 
@@ -209,8 +262,31 @@ def combat(player, ENEMIES, screen, stat_font, text_col, font, clock):
         pygame.display.update()
         clock.tick(60)
 
-            
+#type = 0-player, 1-in-combat
+def health_bar(creature, x, y, type, stat_col, screen):
+    if type==0:
+        hp_font = pygame.font.SysFont(None, 30)
+        background_width = 45 + creature.max_hp*2
+        active_width = background_width*(creature.hp/creature.max_hp)
+
+        pygame.draw.rect(screen, (0,0,0), (x,y, background_width, 25))
+        pygame.draw.rect(screen, (255,0,0),(x,y+1,active_width, 23))
+        draw_text(str(creature.hp) + '/' + str(creature.max_hp), hp_font, stat_col, x+2, y+3, screen)
+
+    elif type==1:
+        hp_font = pygame.font.SysFont(None, 25)
+        background_width = 25 + creature.max_hp
+        active_width = background_width*(creature.hp/creature.max_hp)
+
+        pygame.draw.rect(screen, (0,0,0), (x,y, background_width, 25))
+        pygame.draw.rect(screen, (255,0,0),(x,y+1,active_width, 23))
+        draw_text(str(creature.hp) + '/' + str(creature.max_hp), hp_font, stat_col, x+2, y+3, screen)
+
+
+
+
 # ------------------------------------------------------------------------------------------------------------------------------------------------
 # SPECIAL ENCOUNTERS
 # ------------------------------------------------------------------------------------------------------------------------------------------------
+
 
