@@ -19,11 +19,12 @@ def dice(die_type):
         return 1, 21
 
 class Weapon():
-    def __init__(self, name, stat, enchanted, damage_die):
+    def __init__(self, name, stat, enchanted, damage_die, melee):
         self.name = name
         self.stat = stat
         self.enchanted = enchanted
         self.damage_die = damage_die
+        self. melee = melee
         if self.enchanted != 0:
             self.enchantment = self.enchanted
         else:
@@ -33,8 +34,14 @@ class Weapon():
 
         atk_bonus = int(stat_modifier[getattr(creature, self.stat, None)]) + creature.proficiency_bonus()
         
+        if creature.name == 'Player':
+            if creature.race == 'orc' and self.melee:
+                atk_bonus+=1
+            if creature.race == 'elf' and not self.melee:
+                atk_bonus+=1
         
         atk_dice = functions.d20(advantage, disadvantage)
+        print(atk_dice)
 
         if atk_dice == 20:
             crit = True
@@ -51,6 +58,12 @@ class Weapon():
             damage = 2*np.random.randint(minimum, maximum) + dmg_bonus + self.enchantment
         else:
             damage = np.random.randint(minimum, maximum) + dmg_bonus + self.enchantment
+
+        if creature.name == 'Player':
+            if creature.race == 'orc' and self.melee:
+                damage+=1
+            if creature.race == 'elf' and not self.melee:
+                damage+=1
         return damage
             
 class Armor():
@@ -82,10 +95,10 @@ class Item():
     def __init__(self, name):
         self.name = name
     
-shortsword = Weapon('Shortsword', 'dex', 0, 'd6')
-longsword = Weapon('Longsword', 'str', 0, 'd8')
-longbow = Weapon('Longbow', 'dex', 0, 'd8')
-firebolt = Weapon('Firebolt', 'int', 0, 'd10')
+shortsword = Weapon('Shortsword', 'dex', 0, 'd6', True)
+longsword = Weapon('Longsword', 'str', 0, 'd8', True)
+longbow = Weapon('Longbow', 'dex', 0, 'd8', False)
+firebolt = Weapon('Firebolt', 'int', 0, 'd10', False)
 
 robes = Armor('Clothes', 'Light', 10, True)
 breastplate = Armor('Breastplate', 'Medium', 14, True)

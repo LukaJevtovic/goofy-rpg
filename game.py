@@ -16,17 +16,23 @@ pygame.display.set_caption('Goofy ahh RPG')
 
 clock = pygame.time.Clock()
 
-#Buttons
+# GLOBAL Buttons
 start_img = pygame.image.load('Pictures/start.png').convert_alpha()
 pause_img = pygame.image.load('Pictures/pause.png').convert_alpha()
 quit_img = pygame.image.load('Pictures/quit.png').convert_alpha()
 resume_img = pygame.image.load('Pictures/resume.png').convert_alpha()
 plus_img = pygame.image.load('Pictures/plus.png').convert_alpha()
 minus_img = pygame.image.load('Pictures/minus.png').convert_alpha()
+
+lvlup_icon_img = pygame.image.load('Pictures/levelup_icon.png').convert_alpha()
+
+
 start_button = button.ButtonSlow(100,200, start_img, 0.4)
 pause_button = button.ButtonSlow(10, 10, pause_img, 0.2)
 resume_button = button.ButtonSlow(100, 200, resume_img, 0.4)
 quit_button = button.Button(100, 400, quit_img, 0.4)
+
+lvlup_icon_button = button.ButtonSlow(230, 20, lvlup_icon_img, 0.19)
 
 #STAT SELECT --------------------------------------------------------------------------------------------------------------
 
@@ -68,12 +74,12 @@ elf_selected_img = pygame.image.load('Pictures/elf_selected.png').convert_alpha(
 class_img = pygame.image.load('Pictures/class.png').convert_alpha()
 
 #Buttons
-orc_button = button.ButtonSlow(500, 100, orc_img, 0.4)
-orc_button_pressed = button.ButtonSlow(500, 100, orc_selected_img, 0.4)
-elf_button = button.ButtonSlow(500, 300, elf_img, 0.4)
-elf_button_pressed = button.ButtonSlow(500, 300, elf_selected_img, 0.4)
-human_button = button.ButtonSlow(500, 500, human_img, 0.4)
-human_button_pressed = button.ButtonSlow(500, 500, human_selected_img, 0.4)
+orc_button = button.ButtonSlow(650, 100, orc_img, 0.4)
+orc_button_pressed = button.ButtonSlow(650, 100, orc_selected_img, 0.4)
+elf_button = button.ButtonSlow(650, 300, elf_img, 0.4)
+elf_button_pressed = button.ButtonSlow(650, 300, elf_selected_img, 0.4)
+human_button = button.ButtonSlow(650, 500, human_img, 0.4)
+human_button_pressed = button.ButtonSlow(650, 500, human_selected_img, 0.4)
 
 class_button = button.ButtonSlow(750, 710, class_img, 0.3)
 
@@ -105,6 +111,9 @@ firebolt_selected_img = pygame.image.load('Pictures/firebolt_selected.png').conv
 
 adventure_img = pygame.image.load('Pictures/adventure.png').convert_alpha()
 
+god_mode_img = pygame.image.load('Pictures/god_mode.png').convert_alpha()
+god_mode_selected_img = pygame.image.load('Pictures/god_mode_selected.png').convert_alpha()
+
 
 #Buttons
 equipment_button = button.ButtonSlow(720, 690, equipment_img, 0.3)
@@ -117,6 +126,9 @@ firebolt_button = button.ButtonSlow(500, 100, firebolt_img, 0.4)
 firebolt_selected_button = button.ButtonSlow(500, 100, firebolt_selected_img, 0.4)
 
 adventure_button = button.ButtonSlow(710, 690, adventure_img, 0.25)
+
+god_mode_button = button.ButtonSlow(100, 600, god_mode_img, 0.3)
+god_mode_selected_button = button.ButtonSlow(100, 600, god_mode_selected_img, 0.3)
 
 #CHAPTER 1 --------------------------------------------------------------------------------------------------------------
 
@@ -131,9 +143,7 @@ fight_button3 = button.ButtonSlow(640, 650, fight_img, 0.3)
 dungeon_button = button.ButtonSlow(340, 650, dungeon_img, 0.3)
 
 
-# DUNGEONS --------------------------------------------------------------------------------------------------------------
-DUNGEON_IMGS = [pygame.image.load('Dungeons/intro_dungeon.jpg').convert_alpha()]
-DUNGEONS = [dungeons.Dungeon(DUNGEON_IMGS[0], 620, 400, 0.25, dungeons.DUNGEON_POSITIONS[0])]
+
 
 
 #variables
@@ -162,25 +172,13 @@ point_cost = {9:1, 10:1, 11:1, 12:1, 13:1, 14:2, 15:2}
 point_gain = {14:2, 13:2, 12:1, 11:1, 10:1, 9:1, 8:1}
 stat_modifier = {1:'-5', 2:'-4', 3:'-4', 4:'-3', 5:'-3', 6:'-2', 7:'-2', 8:'-1', 9:'-1', 10:'+0', 11:'+0', 12:'+1', 13:'+1', 14:'+2', 15:'+2', 16:'+3', 17:'+3', 18:'+4', 19:'+4', 20:'+5', 21:'+5', 22:'+6', 23:'+6', 24:'+7', 25:'+7'}
 
-#Game Segment Booleans
-game_paused = False
-stat_select = False
-race_select = False
-class_select = False
-equipment_select = False
+
+
 start_menu = True
 run = True
 
-adventure1 = False
-dungeon1 = False
-dungeon2 = False
-
 #variables
 
-
-
-fighter_selected = False
-wizard_selected = False
 
 
 
@@ -194,8 +192,22 @@ while run:
         pygame.mixer.music.load('Sounds/character_bg.mp3')
         pygame.mixer.music.play(-1)
 
+        #Game Segment Booleans
+        game_paused = False
+        stat_select = False
+        race_select = False
+        class_select = False
+        equipment_select = False
+
+        god_mode = False
+
+        adventure1 = False
+        dungeon1 = False
+        dungeon2 = False
+
+
         STATS = [8,8,8,8,8,8]
-        player = creatures.Player(1, 0, 10, 8, 8, 8, 8, 8, 8, [])
+        player = creatures.Player(1, 0, 0, 10, 8,8,8,8,8,8, [])
         points = 27
 
         screen.fill((229,203,186))
@@ -215,6 +227,11 @@ while run:
         clock.tick(60)
 
 #STAT SELECT --------------------------------------------------------------------------------------------------------------
+
+    if not start_menu:
+        # DUNGEONS --------------------------------------------------------------------------------------------------------------
+        DUNGEON_IMGS = [pygame.image.load('Dungeons/intro_dungeon.jpg').convert_alpha()]
+        DUNGEONS = [dungeons.Dungeon(DUNGEON_IMGS[0], 620, 400, 0.25, dungeons.DUNGEON_POSITIONS[0])]
 
     while stat_select and run:
 
@@ -343,6 +360,11 @@ while run:
             
             elif (orc_selected==False and elf_selected==False and human_selected==False) == False:
                 if orc_selected:
+
+                    functions.draw_text('+2 Strength', font, (0,0,0), 50, 300, screen)
+                    functions.draw_text('+1 Constitution', font, (0,0,0), 50, 330, screen)
+                    functions.text_wrap('You gain a +1 bonus to attack and damage rolls with melee weapons', font, (0,0,0), screen, 50, 360, 0.5*SCREEN_WIDTH)
+
                     if orc_button_pressed.draw(screen):
                         orc_selected = False
                         STATS = STATS_INIT[:]
@@ -360,6 +382,11 @@ while run:
                             STATS[i]+=1
 
                 elif elf_selected:
+
+                    functions.draw_text('+2 Dexterity', font, (0,0,0), 50, 300, screen)
+                    functions.draw_text('+1 Wisdom', font, (0,0,0), 50, 330, screen)
+                    functions.text_wrap('You gain a +1 bonus to attack and damage rolls with ranged weapons', font, (0,0,0), screen, 50, 360, 0.5*SCREEN_WIDTH)
+
                     if orc_button.draw(screen):
                         elf_selected=False
                         orc_selected=True
@@ -377,6 +404,10 @@ while run:
                             STATS[i]+=1
 
                 elif human_selected:
+
+                    functions.draw_text('+1 to all stats', font, (0,0,0), 50, 330, screen)
+                    functions.text_wrap('You gain 10% more experience', font, (0,0,0), screen, 50, 360, 0.5*SCREEN_WIDTH)
+
                     if orc_button.draw(screen):
                         human_selected=False
                         orc_selected=True
@@ -401,6 +432,8 @@ while run:
             if class_button.draw(screen):
                 class_select = True
                 race_select = False
+                fighter_selected = False
+                wizard_selected = False
                 
 
         #Pause Menu
@@ -598,6 +631,16 @@ while run:
             if adventure_button.draw(screen):
                 equipment_select = False
                 adventure1 = True
+            
+            if not god_mode:
+                if god_mode_button.draw(screen):
+                    god_mode = True
+                    player.hp += 100
+
+            elif god_mode:
+                if god_mode_selected_button.draw(screen):
+                    god_mode = False
+                    player.hp -= 100
 
         #Pause Menu
         if game_paused:
@@ -637,6 +680,18 @@ while run:
         player.equipment = P_EQUIPMENT
         player.hp += int(stat_modifier[player.con])
         player.max_hp = player.hp
+        
+        if fighter_selected:
+            player.dnd_class = 'fighter'
+        elif wizard_selected:
+            player.dnd_class = 'wizard'
+
+        if orc_selected:
+            player.race = 'orc'
+        elif elf_selected:
+            player.race = 'elf'
+        elif human_selected:
+            player.race = 'human'
         
         pygame.mixer.music.stop()
         pygame.mixer.music.load('Sounds/adventure_bg.mp3')
@@ -696,8 +751,8 @@ while run:
 
 
         #Player info
-        #functions.draw_stats(STATS, stat_modifier, stat_font, text_col, 50, 80, 20, screen)
-        functions.draw_text('Health: ' + str(player.hp), font, text_col, 50, 230, screen)
+        functions.health_bar(player, 20, 20, 0, (255,255,255), screen)
+        functions.xp_bar(player, 20, 20, (255,255,255), screen)
         functions.draw_text('AC: ' + str(player.ac), font, text_col, 50, 260, screen)
         functions.draw_text('Current equipment:', stat_font, text_col, 50, 300, screen)
         dy = 20
@@ -706,10 +761,10 @@ while run:
 
         #functions.combat(player, [creatures.goblin], screen, stat_font, text_col, font, clock)
 
-        if DUNGEONS[0].draw(screen, player, stat_font, text_col, font, clock) and player.alive:
-            pygame.time.wait(2000)
-            dungeon2 = True
-            dungeon1 = False
+        DUNGEONS[0].draw(screen, player, stat_font, text_col, font, clock) and player.alive
+            #pygame.time.wait(2000)
+            #dungeon2 = True
+            #dungeon1 = False
 
 
         #Pause Menu
@@ -725,6 +780,10 @@ while run:
                         game_paused = False
                 if event.type == pygame.QUIT:
                     run = False
+
+        if player.xp >= player.xp_to_lvlup():
+            if lvlup_icon_button.draw(screen):
+                functions.leveling_menu(player, font, (0,0,0), screen, clock)
         
         for event in pygame.event.get():
 

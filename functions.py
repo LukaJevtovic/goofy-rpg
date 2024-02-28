@@ -99,6 +99,7 @@ def combat(player, ENEMIES, screen, stat_font, text_col, font, clock):
         #draw_text('Health: ' + str(player.hp), font, text_col, 50, 230, screen)
         
         health_bar(player, 20, 20, 0, (255,255,255), screen)
+        xp_bar(player, 20, 20, (255,255,255), screen)
         dy = 30
 
         #Initiative order print
@@ -147,6 +148,7 @@ def combat(player, ENEMIES, screen, stat_font, text_col, font, clock):
                 #draw_text('Health: ' + str(player.hp), font, text_col, 50, 230, screen)
                 
                 health_bar(player, 20, 20, 0, (255,255,255), screen)
+                xp_bar(player, 20, 20, (255,255,255), screen)
                 dy = 30
 
                 #Initiative order print
@@ -202,6 +204,13 @@ def combat(player, ENEMIES, screen, stat_font, text_col, font, clock):
                         
                     else:
                         draw_text(str(sorted_initiatives[selected_enemy][1].name) + ' falls!', font, text_col, 300, 390, screen)
+                        
+                        if player.race == 'human':
+                            draw_text('You gain ' + str(int(1.1*sorted_initiatives[selected_enemy][1].xp)) + ' xp!', font, text_col, 300, 420, screen)
+                            player.xp += int(1.1*sorted_initiatives[selected_enemy][1].xp)
+                        else:
+                            draw_text('You gain ' + str(int(sorted_initiatives[selected_enemy][1].xp)) + ' xp!', font, text_col, 300, 420, screen)
+                            player.xp += int(sorted_initiatives[selected_enemy][1].xp)
                         pygame.display.update()
                         pygame.time.wait(2500)
                         sorted_initiatives.pop(selected_enemy)
@@ -262,6 +271,82 @@ def combat(player, ENEMIES, screen, stat_font, text_col, font, clock):
         pygame.display.update()
         clock.tick(60)
 
+
+def leveling_menu(player, font, color, screen, clock):
+    leveling = True
+    animation = False
+    quitting = False
+
+    continue_img = pygame.image.load('Pictures/continue.png').convert_alpha()
+    continue_button = button.ButtonSlow(600, 600, continue_img, 0.3)
+
+    while leveling and not quitting:
+
+        for event in pygame.event.get():
+
+            #Pause check
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    game_paused = True
+            #Quit check
+            if event.type == pygame.QUIT:
+                run = False
+                quitting = True
+
+
+
+        screen.fill((229,203,186))
+        
+        health_bar(player, 20, 20, 0, (255,255,255), screen)
+        xp_bar(player, 20, 20, (255,255,255), screen)
+
+        draw_text('Level up!', font, color, 400, 20, screen)
+
+
+        if not animation:
+
+            pygame.mixer.Sound('Sounds/levelup.mp3').play()
+
+            draw_text('HP: ' + str(player.max_hp), font, color, 100, 200, screen)
+            pygame.display.update()
+            clock.tick(60)
+            pygame.time.wait(1000)
+
+            draw_text('HP: ' + str(player.max_hp) + ' ->', font, color, 100, 200, screen)
+            pygame.display.update()
+            clock.tick(60)
+            pygame.time.wait(1000)
+            
+            old_hp = player.max_hp
+            animation = True
+
+            if player.dnd_class == 'fighter':
+                draw_text('HP: ' + str(player.max_hp) + ' ->' + ' ' + str(player.max_hp + 6), font, color, 100, 200, screen)
+                player.max_hp+=6
+                player.hp+=6
+                player.lvl = 2
+                pygame.display.update()
+                clock.tick(60)
+                pygame.time.wait(1000)
+            elif player.dnd_class == 'wizard':
+                draw_text('HP: ' + str(player.max_hp) + ' ->' + ' ' + str(player.max_hp + 4), font, color, 100, 200, screen)
+                player.max_hp+=4
+                player.hp+=4
+                player.lvl = 2
+                pygame.display.update()
+                clock.tick(60)
+                pygame.time.wait(1000)
+
+        draw_text('HP: ' + str(old_hp) + ' ->' + ' ' + str(player.max_hp), font, color, 100, 200, screen)
+
+        if continue_button.draw(screen):
+            quitting = True
+
+
+        pygame.display.update()
+        clock.tick(60)
+
+
 #type = 0-player, 1-in-combat
 def health_bar(creature, x, y, type, stat_col, screen):
     if type==0:
@@ -269,9 +354,9 @@ def health_bar(creature, x, y, type, stat_col, screen):
         background_width = 45 + creature.max_hp*2
         active_width = background_width*(creature.hp/creature.max_hp)
 
-        pygame.draw.rect(screen, (0,0,0), (x,y, background_width, 25))
-        pygame.draw.rect(screen, (255,0,0),(x,y+1,active_width, 23))
-        draw_text(str(creature.hp) + '/' + str(creature.max_hp), hp_font, stat_col, x+2, y+3, screen)
+        pygame.draw.rect(screen, (0,0,0), (20, 45, background_width, 25))
+        pygame.draw.rect(screen, (255,0,0),(21,46,active_width, 23))
+        draw_text(str(creature.hp) + '/' + str(creature.max_hp), hp_font, stat_col, 22, 48, screen)
 
     elif type==1:
         hp_font = pygame.font.SysFont(None, 25)
@@ -282,6 +367,19 @@ def health_bar(creature, x, y, type, stat_col, screen):
         pygame.draw.rect(screen, (255,0,0),(x,y+1,active_width, 23))
         draw_text(str(creature.hp) + '/' + str(creature.max_hp), hp_font, stat_col, x+2, y+3, screen)
 
+def xp_bar(player, x, y, col, screen):
+
+    xp_font = pygame.font.SysFont(None, 30)
+    background_width = 200
+
+    if player.xp >= player.xp_to_lvlup():
+        active_width = background_width
+    else:
+        active_width = background_width*(player.xp/player.xp_to_lvlup())
+
+    pygame.draw.rect(screen, (0,0,0), (x, y, background_width, 25))
+    pygame.draw.rect(screen, (179,161,48),(x+1, y+1, active_width, 23))
+    draw_text(str(player.xp) + '/' + str(player.xp_to_lvlup()), xp_font, col, x+2, y+3, screen)
 
 
 

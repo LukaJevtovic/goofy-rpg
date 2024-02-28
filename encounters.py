@@ -104,11 +104,11 @@ class combat_boss():
     def begin(self, player, screen, stat_font, text_col, font, clock):
 
         if len(COMBAT_BOSS)>1:
-            j = np.random.randint(0, len(COMBAT_BOSS)-1)
+            j = np.random.randint(0, len(COMBAT_BOSS))
         else:
             j=0
 
-            ENEMIES = COMBAT_BOSS[j]
+        ENEMIES = COMBAT_BOSS[j]
 
         functions.combat(player, ENEMIES, screen, stat_font, text_col, font, clock)
 
@@ -171,13 +171,14 @@ class event_regular():
 
         screen.fill((229,203,186))
 
-        functions.draw_text('You find a lost pouch of gold! (Work in progress)', font, text_col, 100, 100, screen)
-        player.equipment.append(equipment.gold_pouch)
+        functions.text_wrap('A wise man that hangs around in the dungeon shares his wisdoms! You gain 150xp (Work in progress)', font, text_col, screen, 100, 100, SCREEN_WIDTH-200)
+        player.xp+=150
         pygame.display.update()
         pygame.time.wait(4000)
 
 
 COMBAT1 = [[creatures.basic_enemy(*creatures.goblin_stats)]]
 
-COMBAT_BOSS = [[creatures.basic_enemy(*creatures.goblin_stats), creatures.basic_enemy(*creatures.goblin_stats), creatures.basic_enemy(*creatures.goblin_stats)]]
+COMBAT_BOSS = [[creatures.basic_enemy(*creatures.goblin_stats), creatures.basic_enemy(*creatures.goblin_stats)], [creatures.goblin_brute]]
+
 
