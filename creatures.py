@@ -10,6 +10,8 @@ class Player():
         self.lvl = lvl
         self.max_hp = hp
         self.xp = xp
+        self.max_mp = 0
+        self.mp = 0
         self.dnd_class = ''
         self.race = ''
 
@@ -23,6 +25,7 @@ class Player():
 
         self.hp = self.max_hp
         self.equipment = P_EQUIPMENT
+        self.gold = 0
         self.alive = True
 
     def xp_to_lvlup(self):

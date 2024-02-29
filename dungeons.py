@@ -1,5 +1,5 @@
 import pygame
-import button
+import functions
 import encounters
 import numpy as np
 

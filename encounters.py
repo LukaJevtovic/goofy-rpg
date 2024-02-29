@@ -58,6 +58,8 @@ class combat_regular():
 
         functions.combat(player, ENEMIES, screen, stat_font, text_col, font, clock)
 
+        functions.loot_menu(player, self.difficulty, screen, clock)
+
 
 
 class combat_boss():
@@ -111,6 +113,8 @@ class combat_boss():
         ENEMIES = COMBAT_BOSS[j]
 
         functions.combat(player, ENEMIES, screen, stat_font, text_col, font, clock)
+
+        functions.loot_menu(player, 4, screen, clock)
 
 
 

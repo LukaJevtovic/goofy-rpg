@@ -683,8 +683,12 @@ while run:
         
         if fighter_selected:
             player.dnd_class = 'fighter'
+            player.max_mp = 2
+            player.mp = 2
         elif wizard_selected:
             player.dnd_class = 'wizard'
+            player.max_mp = 10
+            player.mp = 10
 
         if orc_selected:
             player.race = 'orc'
@@ -753,11 +757,13 @@ while run:
         #Player info
         functions.health_bar(player, 20, 20, 0, (255,255,255), screen)
         functions.xp_bar(player, 20, 20, (255,255,255), screen)
+        functions.mana_bar(player, 20, 70, (255,255,255), screen)
         functions.draw_text('AC: ' + str(player.ac), font, text_col, 50, 260, screen)
         functions.draw_text('Current equipment:', stat_font, text_col, 50, 300, screen)
+        functions.draw_text('Gold: ' + str(player.gold), pygame.font.SysFont(None, 30), (0,0,0), 50, 320, screen)
         dy = 20
         for i in range(len(player.equipment)):
-            functions.draw_text(player.equipment[i].name, stat_font, text_col, 50, 320 + i*dy, screen)
+            functions.draw_text(player.equipment[i].name, stat_font, text_col, 50, 340 + i*dy, screen)
 
         #functions.combat(player, [creatures.goblin], screen, stat_font, text_col, font, clock)
 
