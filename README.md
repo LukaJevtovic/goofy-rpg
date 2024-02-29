@@ -17,14 +17,12 @@ Note that the executables will probably be a couple of versions behind the actua
 
 ## ROADMAP
 
-1. Add xp and mana bars, similar to the health bar
-2. Add race functionality beyond just stat increases
-3. Add second level features and levelup menu
-4. Implement spellcasting mechanics and add a couple of low level spells
-5. Add class functionality beyond just starting equipment and health
-6. Populate encounters lists
-7. Implement seeded random-generated dungeons
-8. Implement an inventory system (being able to select one of several weapons from inventory when attacking, for a start)
+1. Add class features for the first five levels
+2. Implement spellcasting mechanics and add a couple of low level spells
+3. Populate encounters lists
+4. Add some more dungeons, develop dungeon chains
+5. Add difficulty 2 and 3 encounters
+6. Implement an inventory system
 
 ## CREDITS:
 
