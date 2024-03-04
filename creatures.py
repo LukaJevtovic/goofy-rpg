@@ -2,29 +2,33 @@ import numpy as np
 import equipment
 
 #proficiency_bonus = {1:2, 2:2, 3:2, 4:2, 5:3, 6:3, 7:3, 8:3, 9:4, 10:4, 11:4, 12:4, 13:5, 14:5, 15:5, 16:5, 17:6, 18:6, 19:6, 20:6}
+stat_modifier = {1:'-5', 2:'-4', 3:'-4', 4:'-3', 5:'-3', 6:'-2', 7:'-2', 8:'-1', 9:'-1', 10:'+0', 11:'+0', 12:'+1', 13:'+1', 14:'+2', 15:'+2', 16:'+3', 17:'+3', 18:'+4', 19:'+4', 20:'+5', 21:'+5', 22:'+6', 23:'+6', 24:'+7', 25:'+7'}
 lvlup_xp = {1:300, 2:900, 3:2700, 4:6500}
 
 class Player():
-    def __init__(self, lvl, xp, hp, AC, str, dex, con, int, wis, cha, P_EQUIPMENT):
+    def __init__(self):
         self.name = 'Player'
-        self.lvl = lvl
-        self.max_hp = hp
-        self.xp = xp
+        self.lvl = 1
+        self.max_hp = 0
+        self.xp = 0
         self.max_mp = 0
         self.mp = 0
         self.dnd_class = ''
         self.race = ''
 
-        self.ac = AC
-        self.str = str
-        self.dex = dex
-        self.con = con
-        self.int = int
-        self.wis = wis
-        self.cha = cha
+        self.str = 8
+        self.dex = 8
+        self.con = 8
+        self.int = 8
+        self.wis = 8
+        self.cha = 8
 
         self.hp = self.max_hp
-        self.equipment = P_EQUIPMENT
+        self.left_hand = None
+        self.armor = None
+        self.right_hand = None
+        self.inventory_size = 6
+        self.inventory = []
         self.gold = 0
         self.alive = True
 
@@ -47,13 +51,23 @@ class Player():
     def weapons(self):
         WEAPONS = [item for item in self.equipment if isinstance(item, equipment.Weapon)]
         return WEAPONS
+    
+    def ac(self):
 
+        if self.left_hand != None:
+            left_bonus = self.left_hand.ac
+        else:
+            left_bonus = 0
 
-    #def attack_roll(self, selected_weapon):
-    #    self.weapons[selected_weapon].attack_roll(self)
+        if self.right_hand != None:
+            right_bonus = self.right_hand.ac
+        else:
+            right_bonus = 0
 
-    #def damage_roll(self, selected_weapon):
-    #    self.weapons[selected_weapon].damage_roll()
+        if self.armor != None:
+            return self.armor.find_ac(int(stat_modifier[self.dex])) + left_bonus + right_bonus
+        else:
+            return 10 + int(stat_modifier[self.dex]) + left_bonus + right_bonus
 
 
     def take_damage(self, amount):
@@ -97,8 +111,8 @@ class basic_enemy():
         return dead
     
 goblin_stats = ['Goblin', 50, 7, 15, 8, 14, 10, 10, 8, 8, equipment.shortsword, 2]
-goblin_brute_stats = ['Goblin brute', 100, 18, 9, 16, 8, 16, 8, 8, 8, equipment.firebolt, 4]
-goblin_brute = basic_enemy('Goblin brute', 100, 18, 9, 16, 8, 16, 8, 8, 8, equipment.firebolt, 4)
+goblin_brute_stats = ['Goblin brute', 100, 18, 9, 16, 8, 16, 8, 8, 8, equipment.longsword, 4]
+goblin_brute = basic_enemy('Goblin brute', 100, 18, 9, 16, 8, 16, 8, 8, 8, equipment.longsword, 4)
 #goblin = basic_enemy('goblin', 7, 15, 8, 14, 10, 10, 8, 8, equipment.shortsword, 4, 2)
 
 

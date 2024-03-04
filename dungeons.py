@@ -14,7 +14,6 @@ class Dungeon():
             self.completeness.append(False)
 
             if (EVENTS[i][0] == 1) or (EVENTS[i][0] == 2) or (EVENTS[i][0] == 3):
-                j = np.random.randint(0, len(encounters.COMBAT1))
                 self.EVENTS.append(encounters.combat_regular(EVENTS[i][0], 0.11, EVENTS[i][1], EVENTS[i][2]))
             elif EVENTS[i][0] == 4:
                 self.EVENTS.append(encounters.combat_boss(0.11, EVENTS[i][1], EVENTS[i][2]))

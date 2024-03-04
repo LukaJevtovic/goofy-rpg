@@ -12,10 +12,6 @@ def draw_text(text, font, color, x, y, screen):
     screen.blit(img, (x,y))
     return width
 
-
-
-
-
 def draw_stats(STATS, stat_modifier, font, color, x, y, dy, screen):
     draw_text('Strength: ' + str(STATS[0]) + ' (' + stat_modifier[STATS[0]] + ')', font, color, x, y, screen)
     draw_text('Dexterity: ' + str(STATS[1]) + ' (' + stat_modifier[STATS[1]] + ')', font, color, x, y+dy, screen)
@@ -78,20 +74,14 @@ def combat(player, ENEMIES, screen, stat_font, text_col, font, clock):
 
     sorted_initiatives = sorted(all_initiatives, key=lambda x: x[0], reverse=True)
 
-    WEAPONS = player.weapons()
+    
     WPN_BUTTONS = []
     x = 20
     y = 600
     i=0
-
-    if len(WEAPONS)>3:
-        while i<3:
-            WPN_BUTTONS.append(WEAPONS[i].get_button(player, x+i*200, y, 1))
-            i+=1
-    else:
-        while i<len(WEAPONS):
-            WPN_BUTTONS.append(WEAPONS[i].get_button(player, x+i*200, y, 1))
-            i+=1
+    
+    WPN_BUTTONS.append(player.right_hand.get_button(player, x+i*200, y, 1))
+        
     quitting = False
 
     #Position of log lines
@@ -199,7 +189,7 @@ def combat(player, ENEMIES, screen, stat_font, text_col, font, clock):
                 if selected_weapon == -1:
                     draw_text('Choose an attack!', font, text_col, log_x, log_y + 210, screen)
                 else:
-                    draw_text('Chosen attack: ' + WEAPONS[selected_weapon].name, font, text_col, log_x, log_y + 210, screen)
+                    draw_text('Chosen attack: ' + player.right_hand.name, font, text_col, log_x, log_y + 210, screen)
 
                 for wpn_button in WPN_BUTTONS:
                     if wpn_button.draw(screen):
@@ -219,11 +209,10 @@ def combat(player, ENEMIES, screen, stat_font, text_col, font, clock):
                 #TODO: Add option for selecting a weapon/spell from inventory to use in the attack
                 selected_weapon = 0
 
-                #draw_text('Attack roll:     vs.' + str(sorted_initiatives[selected_enemy][1].ac) + 'AC', font, text_col, 100, 30, screen)
                 
 
                 dice_sound()
-                attack_roll, crit = WEAPONS[selected_weapon].attack_roll(player)
+                attack_roll, crit = player.right_hand.attack_roll(player)
 
                 if attack_roll >= sorted_initiatives[selected_enemy][1].ac:
 
@@ -232,7 +221,7 @@ def combat(player, ENEMIES, screen, stat_font, text_col, font, clock):
                     pygame.display.update()
                     pygame.time.wait(2500)
 
-                    damage = WEAPONS[selected_weapon].damage_roll(player, crit)
+                    damage = player.right_hand.damage_roll(player, crit)
                     dice_sound()
                     draw_text(str(sorted_initiatives[selected_enemy][1].name) + ' takes ' + str(damage) + ' damage!', font, text_col, log_x, log_y + 60, screen)
                     sorted_initiatives[selected_enemy][1].take_damage(damage)
@@ -272,15 +261,15 @@ def combat(player, ENEMIES, screen, stat_font, text_col, font, clock):
             
             enemy = sorted_initiatives[0][1]
 
-            #draw_text('Attack roll:     vs.' + str(player.ac) + 'AC', font, text_col, 100, 30, screen)
+            #draw_text('Attack roll:     vs.' + str(player.ac()) + 'AC', font, text_col, 100, 30, screen)
             #pygame.time.wait(2500)
 
             dice_sound()
             attack_roll, crit = enemy.weapon.attack_roll(enemy)
 
-            if attack_roll >= player.ac:
+            if attack_roll >= player.ac():
 
-                draw_text('Attack roll: ' + str(attack_roll) + ' vs. ' + str(player.ac) + 'AC', font, text_col, log_x, log_y, screen)
+                draw_text('Attack roll: ' + str(attack_roll) + ' vs. ' + str(player.ac()) + 'AC', font, text_col, log_x, log_y, screen)
                 draw_text(enemy.name + ' hits you!', font, text_col, log_x, log_y + 30, screen)
                 pygame.display.update()
                 pygame.time.wait(2500)
@@ -301,7 +290,7 @@ def combat(player, ENEMIES, screen, stat_font, text_col, font, clock):
                     pygame.time.wait(2500)
 
             else:
-                draw_text('Attack roll: ' + str(attack_roll) +     ' vs.' + str(player.ac) + 'AC', font, text_col, log_x, log_y, screen)
+                draw_text('Attack roll: ' + str(attack_roll) +     ' vs.' + str(player.ac()) + 'AC', font, text_col, log_x, log_y, screen)
                 draw_text(enemy.name + ' missed you!',font, text_col, log_x, log_y + 30, screen)
                 pygame.display.update()
                 pygame.time.wait(2500)
@@ -310,7 +299,6 @@ def combat(player, ENEMIES, screen, stat_font, text_col, font, clock):
 
         pygame.display.update()
         clock.tick(60)
-
 
 def leveling_menu(player, font, color, screen, clock):
     leveling = True
@@ -513,12 +501,28 @@ def loot_menu(player, difficulty, screen, clock):
         health_bar(player, 20, 20, 0, (255,255,255), screen)
         xp_bar(player, 20, 20, (255,255,255), screen)
         mana_bar(player, 20, 70, (255,255,255), screen)
-        draw_text('AC: ' + str(player.ac), pygame.font.SysFont(None, 40), (0,0,0), 50, 260, screen)
-        draw_text('Current equipment:', pygame.font.SysFont(None, 30), (0,0,0), 50, 300, screen)
-        draw_text('Gold: ' + str(player.gold), pygame.font.SysFont(None, 30), (0,0,0), 50, 320, screen)
+        draw_text('AC: ' + str(player.ac()), pygame.font.SysFont(None, 40), (0,0,0), 50, 260, screen)
+        draw_text('Gold: ' + str(player.gold), pygame.font.SysFont(None, 30), (0,0,0), 50, 300, screen)
+        draw_text('Inventory slots: ' + str(len(player.inventory)) + '/' + str(player.inventory_size), pygame.font.SysFont(None, 30), (0,0,0), 50, 320, screen)
+        draw_text('Current equipment:', pygame.font.SysFont(None, 30), (0,0,0), 50, 340, screen)
+
         dy = 20
-        for i in range(len(player.equipment)):
-            draw_text(player.equipment[i].name, pygame.font.SysFont(None, 30), (0,0,0), 50, 340 + i*dy, screen)
+        j=1
+        if player.right_hand != None:
+            draw_text(player.right_hand.name, pygame.font.SysFont(None, 30), (0,0,0), 50, 340 + j*dy, screen)
+            j+=1
+            
+        if player.left_hand != None:
+            draw_text(player.left_hand.name, pygame.font.SysFont(None, 30), (0,0,0), 50, 340 + j*dy, screen)
+            j+=1
+
+        if player.armor != None:
+            draw_text(player.armor.name, pygame.font.SysFont(None, 30), (0,0,0), 50, 340 + j*dy, screen)
+            j+=1
+
+        for item in player.inventory:
+            draw_text(item.name, pygame.font.SysFont(None, 30), (0,0,0), 50, 340 + j*dy, screen)
+            j+=1
 
         i=0
         while i<len(BUTTONS):
@@ -526,7 +530,10 @@ def loot_menu(player, difficulty, screen, clock):
                 if LOOT[i].name == 'gold':
                     player.gold += LOOT[i].value
                 else:
-                    player.equipment.append(LOOT[i])
+                    if len(player.inventory) <= player.inventory_size:
+                        player.inventory.append(LOOT[i])
+                    else:
+                        draw_text('Your inventory is full! (work in progress)', pygame.font.SysFont(None, 30), (0,0,0), 700, 500, screen)
             i+=1
 
         if continue_button.draw(screen):
@@ -534,6 +541,71 @@ def loot_menu(player, difficulty, screen, clock):
 
         pygame.display.update()
         clock.tick(60)
+
+def inventory_menu(player, screen, clock, SCREEN_WIDTH, SCREEN_HEIGHT):
+
+    scale = 1000/SCREEN_WIDTH
+    inventorying = True
+    quitting = False
+
+    weapon_selected = False
+    armor_selected = False
+    shield_selected = False
+
+    while inventorying and not quitting:
+
+        for event in pygame.event.get():
+            #Quit check
+            if event.type == pygame.QUIT:
+                quitting = True
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_i:
+                    inventorying = False
+
+        screen.fill((229,203,186))
+        health_bar(player, scale*20, scale*20, 0, (255,255,255), screen)
+        xp_bar(player, scale*20, scale*20, (255,255,255), screen)
+        mana_bar(player, scale*20, scale*70, (255,255,255), screen)
+        draw_text('Inventory', pygame.font.SysFont(None, 50), (0,0,0), 500, 30, screen)
+        draw_text('Equipped w')
+
+        #Draw inventory slots
+        i=0
+        j=0
+        x=50
+        y=500
+        dx = 20
+        dy = 80
+        while i<12:
+            if i<player.inventory_size:
+                pygame.draw.rect(screen, (74,5,44), pygame.Rect(scale*(x + j*(150+dx)), scale*y, 150,50), width=4)
+                j+=1
+
+                if j == 4:
+                    y+=dy
+                    j=0
+
+            else:
+                pygame.draw.rect(screen, (138,138,138), pygame.Rect(scale*(x + j*(150+dx)), scale*y, 150,50), width=0)
+                j+=1
+
+                if j == 4:
+                    y+=dy
+                    j=0
+
+            i+=1
+
+        #Draw equippable slots differently depending on which item is currently held
+        #if not all(weapon_selected, armor_selected, shield_selected):
+
+        
+
+
+
+
+        pygame.display.update()
+        clock.tick(60)
+
 
 
 

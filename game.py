@@ -207,7 +207,8 @@ while run:
 
 
         STATS = [8,8,8,8,8,8]
-        player = creatures.Player(1, 0, 0, 10, 8,8,8,8,8,8, [])
+        player = creatures.Player()
+        player.inventory = []
         points = 27
 
         screen.fill((229,203,186))
@@ -434,6 +435,8 @@ while run:
                 race_select = False
                 fighter_selected = False
                 wizard_selected = False
+                [player.str, player.dex, player.con, player.int, player.wis, player.cha] = STATS
+                player.hp = 0 + int(stat_modifier[player.con])
                 
 
         #Pause Menu
@@ -473,7 +476,7 @@ while run:
         if not game_paused:
 
             functions.draw_stats(STATS, stat_modifier, stat_font, text_col, 50, 80, 20, screen)
-            functions.draw_text('Health: ' + str(player.hp + int(stat_modifier[STATS[2]])), font, text_col, 50, 230, screen)
+            functions.draw_text('Health: ' + str(player.hp), font, text_col, 50, 230, screen)
 
             #Pause button
             if pause_button.draw(screen):
@@ -483,40 +486,44 @@ while run:
             if fighter_selected==False and wizard_selected==False:
                 if fighter_button.draw(screen):
                     fighter_selected=True
-                    player.hp = 10
+                    player.hp = 10 + int(stat_modifier[player.con])
                 if wizard_button.draw(screen):
                     wizard_selected = True
-                    player.hp = 6
+                    player.hp = 6 + int(stat_modifier[player.con])
                 
-            if (fighter_selected==False and wizard_selected==False) == False:
+            if fighter_selected or wizard_selected:
 
                 if fighter_selected:
                     functions.draw_text('Longsword + Shield OR Longbow + Arrows', font, text_col, 100, 650, screen)
                     if fighter_selected_button.draw(screen):
                         fighter_selected = False
-                        player.hp = 0
+                        player.hp = 0 + int(stat_modifier[player.con])
                     if wizard_button.draw(screen):
                         fighter_selected = False
                         wizard_selected = True
-                        player.hp = 6
+                        player.hp = 6 + int(stat_modifier[player.con])
 
                 if wizard_selected:
                     functions.draw_text('Firebolt (#TODO: Spells)', font, text_col, 100, 650, screen)
                     if fighter_button.draw(screen):
                         wizard_selected = False
                         fighter_selected = True
-                        player.hp = 10
+                        player.hp = 10 + int(stat_modifier[player.con])
                     if wizard_selected_button.draw(screen):
                         wizard_selected = False
-                        player.hp = 0
+                        player.hp = 0 + int(stat_modifier[player.con])
 
             if back_button.draw(screen):
                 class_select = False
                 race_select = True
+                [player.str, player.dex, player.con, player.int, player.wis, player.cha] = [8,8,8,8,8,8]
+                player.hp = 0
             if equipment_button.draw(screen):
                 class_select = False
                 equipment_select = True
-                P_EQUIPMENT = []
+                fighter_longsword = False
+                fighter_longbow = False
+                wizard_firebolt = False
 
 
         #Pause Menu
@@ -553,26 +560,25 @@ while run:
         screen.fill((229,203,186))
 
         if not game_paused:
-            if len(P_EQUIPMENT) == 0:
-                player.ac = 10 + int(stat_modifier[STATS[1]])
-            for i in P_EQUIPMENT:
-                if isinstance(i, equipment.Armor):
-                    if equipment.shield in P_EQUIPMENT:
-                        player.ac = i.find_ac(int(stat_modifier[STATS[1]])) + 2
-                        break
-                    else:
-                        player.ac = i.find_ac(int(stat_modifier[STATS[1]]))
-                        break
-                else:
-                    player.ac = 10 + int(stat_modifier[STATS[1]])
 
-            functions.draw_stats(STATS, stat_modifier, stat_font, text_col, 50, 80, 20, screen)
-            functions.draw_text('Health: ' + str(player.hp + int(stat_modifier[STATS[2]])), font, text_col, 50, 230, screen)
-            functions.draw_text('AC: ' + str(player.ac), font, text_col, 50, 260, screen)
+            functions.draw_stats([player.str, player.dex, player.con, player.int, player.wis, player.cha], stat_modifier, stat_font, text_col, 50, 80, 20, screen)
+            functions.draw_text('Health: ' + str(player.hp), font, text_col, 50, 230, screen)
+            functions.draw_text('AC: ' + str(player.ac()), font, text_col, 50, 260, screen)
             functions.draw_text('Current equipment:', stat_font, text_col, 50, 300, screen)
             dy = 20
-            for i in range(len(P_EQUIPMENT)):
-                functions.draw_text(P_EQUIPMENT[i].name, stat_font, text_col, 50, 320 + i*dy, screen)
+            j=0
+            
+            if player.right_hand != None:
+                functions.draw_text(player.right_hand.name, stat_font, text_col, 50, 320 + j*dy, screen)
+                j+=1
+            
+            if player.left_hand != None:
+                functions.draw_text(player.left_hand.name, stat_font, text_col, 50, 320 + j*dy, screen)
+                j+=1
+
+            if player.armor != None:
+                functions.draw_text(player.armor.name, stat_font, text_col, 50, 320 + j*dy, screen)
+
             
 
             #Pause button
@@ -582,52 +588,69 @@ while run:
             #Fighter
 
             if fighter_selected:
-                if equipment.breastplate not in P_EQUIPMENT:
-                    P_EQUIPMENT.append(equipment.breastplate)
-                if len(P_EQUIPMENT) == 1:
-                    if longsword_button.draw(screen):
-                        P_EQUIPMENT.append(equipment.longsword)
-                        P_EQUIPMENT.append(equipment.shield)
-                    if longbow_button.draw(screen):
-                        P_EQUIPMENT.append(equipment.longbow)
-                        arrows=30
+                if player.armor != equipment.breastplate:
+                    player.armor = equipment.breastplate
 
-                if equipment.longsword in P_EQUIPMENT:
+                if not fighter_longbow and not fighter_longsword:
+                    if longsword_button.draw(screen):
+                        if player.left_hand != equipment.shield:
+                            player.left_hand = equipment.shield
+                        if player.right_hand != equipment.longsword:
+                            player.right_hand = equipment.longsword
+                        fighter_longsword = True
+                    if longbow_button.draw(screen):
+                        player.left_hand = None
+                        player.right_hand = equipment.longbow
+                        fighter_longbow = True
+
+                if fighter_longsword:
                     if longsword_selected_button.draw(screen):
-                        P_EQUIPMENT.remove(equipment.longsword)
-                        P_EQUIPMENT.remove(equipment.shield)
-                    if longbow_button.draw(screen):
-                        P_EQUIPMENT.remove(equipment.longsword)
-                        P_EQUIPMENT.remove(equipment.shield)
-                        P_EQUIPMENT.append(equipment.longbow)
-                        arrows = 30
+                        player.right_hand = None
+                        player.left_hand = None
+                        fighter_longsword = False
 
-                if equipment.longbow in P_EQUIPMENT:
+                    if longbow_button.draw(screen):
+                        player.right_hand = equipment.longbow
+                        player.left_hand = None
+                        fighter_longsword = False
+                        fighter_longbow = True
+
+                if fighter_longbow:
                     if longsword_button.draw(screen):
-                        P_EQUIPMENT.remove(equipment.longbow)
-                        arrows = 0
-                        P_EQUIPMENT.append(equipment.longsword)
-                        P_EQUIPMENT.append(equipment.shield)
+                        player.right_hand = equipment.longsword
+                        player.left_hand = equipment.shield
+                        fighter_longbow = False
+                        fighter_longsword = True
+
                     if longbow_selected_button.draw(screen):
-                        P_EQUIPMENT.remove(equipment.longbow)
-                        arrows = 0
+                        player.right_hand = None
+                        fighter_longbow = False
 
             #Wizard
             if wizard_selected:
-                if equipment.robes not in P_EQUIPMENT:
-                    P_EQUIPMENT.append(equipment.robes)
-                if len(P_EQUIPMENT) == 1:
+                if player.armor != equipment.robes:
+                    player.armor = equipment.robes
+                if not wizard_firebolt:
                     if firebolt_button.draw(screen):
-                        P_EQUIPMENT.append(equipment.firebolt)
+                        player.right_hand = equipment.firebolt
+                        wizard_firebolt = True
                     
-                if equipment.firebolt in P_EQUIPMENT:
+                if wizard_firebolt:
                     if firebolt_selected_button.draw(screen):
-                        P_EQUIPMENT.remove(equipment.firebolt)
+                        player.right_hand = None
+                        wizard_firebolt = False
                     
 
             if back_button.draw(screen):
                 equipment_select = False
                 class_select = True
+                player.armor = None
+                player.left_hand  = None
+                player.right_hand = None
+                fighter_longbow = False
+                fighter_longsword = False
+                wizard_firebolt = False
+
             if adventure_button.draw(screen):
                 equipment_select = False
                 adventure1 = True
@@ -677,18 +700,16 @@ while run:
     if adventure1:
 
         player.str, player.dex, player.con, player.int, player.wis, player.cha = STATS
-        player.equipment = P_EQUIPMENT
-        player.hp += int(stat_modifier[player.con])
         player.max_hp = player.hp
         
         if fighter_selected:
             player.dnd_class = 'fighter'
-            player.max_mp = 2
-            player.mp = 2
+            player.max_mp = 2 + int(stat_modifier[player.wis])
+            player.mp = 2 + int(stat_modifier[player.wis])
         elif wizard_selected:
             player.dnd_class = 'wizard'
-            player.max_mp = 10
-            player.mp = 10
+            player.max_mp = 10 + int(stat_modifier[player.wis])
+            player.mp = 10 + int(stat_modifier[player.wis])
 
         if orc_selected:
             player.race = 'orc'
@@ -758,14 +779,22 @@ while run:
         functions.health_bar(player, 20, 20, 0, (255,255,255), screen)
         functions.xp_bar(player, 20, 20, (255,255,255), screen)
         functions.mana_bar(player, 20, 70, (255,255,255), screen)
-        functions.draw_text('AC: ' + str(player.ac), font, text_col, 50, 260, screen)
+        functions.draw_text('AC: ' + str(player.ac()), font, text_col, 50, 260, screen)
         functions.draw_text('Current equipment:', stat_font, text_col, 50, 300, screen)
         functions.draw_text('Gold: ' + str(player.gold), pygame.font.SysFont(None, 30), (0,0,0), 50, 320, screen)
         dy = 20
-        for i in range(len(player.equipment)):
-            functions.draw_text(player.equipment[i].name, stat_font, text_col, 50, 340 + i*dy, screen)
+        j=0
+        if player.right_hand != None:
+            functions.draw_text(player.right_hand.name, stat_font, text_col, 50, 340 + j*dy, screen)
+            j+=1
+            
+        if player.left_hand != None:
+            functions.draw_text(player.left_hand.name, stat_font, text_col, 50, 340 + j*dy, screen)
+            j+=1
 
-        #functions.combat(player, [creatures.goblin], screen, stat_font, text_col, font, clock)
+        if player.armor != None:
+            functions.draw_text(player.armor.name, stat_font, text_col, 50, 340 + j*dy, screen)
+
 
         DUNGEONS[0].draw(screen, player, stat_font, text_col, font, clock) and player.alive
             #pygame.time.wait(2000)
@@ -797,6 +826,8 @@ while run:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     game_paused = True
+                if event.key == pygame.K_i:
+                    functions.inventory_menu(player, screen, clock, SCREEN_WIDTH, SCREEN_HEIGHT)
             #Quit check
             if event.type == pygame.QUIT:
                 run = False

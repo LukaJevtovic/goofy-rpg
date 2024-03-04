@@ -49,6 +49,9 @@ class combat_regular():
         surface.blit(self.image, (self.rect.x, self.rect.y))
 
     def begin(self, player, screen, stat_font, text_col, font, clock):
+
+        COMBAT1, irrelevant = initiate_encounter_lists()
+
         if self.difficulty == 1:
             if len(COMBAT1)>1:
                 j = np.random.randint(0, len(COMBAT1)-1)
@@ -58,7 +61,8 @@ class combat_regular():
 
         functions.combat(player, ENEMIES, screen, stat_font, text_col, font, clock)
 
-        functions.loot_menu(player, self.difficulty, screen, clock)
+        if player.alive:
+            functions.loot_menu(player, self.difficulty, screen, clock)
 
 
 
@@ -104,6 +108,7 @@ class combat_boss():
         surface.blit(self.image, (self.rect.x, self.rect.y))
 
     def begin(self, player, screen, stat_font, text_col, font, clock):
+        irrelevant, COMBAT_BOSS = initiate_encounter_lists()
 
         if len(COMBAT_BOSS)>1:
             j = np.random.randint(0, len(COMBAT_BOSS))
@@ -114,7 +119,8 @@ class combat_boss():
 
         functions.combat(player, ENEMIES, screen, stat_font, text_col, font, clock)
 
-        functions.loot_menu(player, 4, screen, clock)
+        if player.alive:
+            functions.loot_menu(player, 4, screen, clock)
 
 
 
@@ -181,8 +187,11 @@ class event_regular():
         pygame.time.wait(4000)
 
 
-COMBAT1 = [[creatures.basic_enemy(*creatures.goblin_stats)]]
+def initiate_encounter_lists():
+    COMBAT1 = [[creatures.basic_enemy(*creatures.goblin_stats)]]
 
-COMBAT_BOSS = [[creatures.basic_enemy(*creatures.goblin_stats), creatures.basic_enemy(*creatures.goblin_stats)], [creatures.goblin_brute]]
+    COMBAT_BOSS = [[creatures.basic_enemy(*creatures.goblin_stats), creatures.basic_enemy(*creatures.goblin_stats)], [creatures.basic_enemy('Goblin brute', 100, 18, 9, 16, 8, 16, 8, 8, 8, equipment.longsword, 4)]]
+
+    return COMBAT1, COMBAT_BOSS
 
 

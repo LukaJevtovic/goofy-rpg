@@ -5,28 +5,27 @@ import button
 
 stat_modifier = {1:'-5', 2:'-4', 3:'-4', 4:'-3', 5:'-3', 6:'-2', 7:'-2', 8:'-1', 9:'-1', 10:'+0', 11:'+0', 12:'+1', 13:'+1', 14:'+2', 15:'+2', 16:'+3', 17:'+3', 18:'+4', 19:'+4', 20:'+5', 21:'+5', 22:'+6', 23:'+6', 24:'+7', 25:'+7'}
 
-def dice(die_type):
+def dice_roll(die_type):
+    num_dice, dice_type = map(int, die_type.split('d'))
 
-    if die_type == 'd4':
-        return 1, 5
-    elif die_type == 'd6':
-        return 1, 7
-    elif die_type == 'd8':
-        return 1,9
-    elif die_type == 'd10':
-        return 1,11
-    elif die_type == 'd12':
-        return 1, 13
-    elif die_type == 'd20':
-        return 1, 21
+    i=0
+    num=0
+
+    while i<num_dice:
+        num+= np.random.randint(1, dice_type+1)
+        i+=1
+    
+    return num
 
 class Weapon():
-    def __init__(self, name, stat, enchanted, damage_die, melee):
+    def __init__(self, name, stat, enchanted, damage_die, melee, two_handed, AC):
         self.name = name
         self.stat = stat
         self.enchanted = enchanted
         self.damage_die = damage_die
         self. melee = melee
+        self.two_handed = two_handed
+        self.ac = AC
         if self.enchanted != 0:
             self.enchantment = self.enchanted
         else:
@@ -55,17 +54,19 @@ class Weapon():
     def damage_roll(self, creature, crit):
         dmg_bonus = int(stat_modifier[getattr(creature, self.stat, None)])
 
-        minimum, maximum = dice(self.damage_die)
+        damage = dice_roll(self.damage_die)
         if crit:
-            damage = 2*np.random.randint(minimum, maximum) + dmg_bonus + self.enchantment
+            damage = 2*damage + dmg_bonus + self.enchantment
         else:
-            damage = np.random.randint(minimum, maximum) + dmg_bonus + self.enchantment
+            damage += dmg_bonus + self.enchantment
 
         if creature.name == 'Player':
             if creature.race == 'orc' and self.melee:
                 damage+=1
             if creature.race == 'elf' and not self.melee:
                 damage+=1
+
+        print('damage' + str(damage))
         return damage
     
     def get_button(self, creature, x, y, scale):
@@ -214,8 +215,9 @@ class Armor():
             return self.ac
         
 class Shield():
-    def __init__(self, name):
+    def __init__(self, name, ac_bonus):
         self.name = name
+        self.ac = ac_bonus
 
 class Item():
     def __init__(self, name, value):
@@ -253,18 +255,18 @@ class Spell():
 
 
 
-shortsword = Weapon('Shortsword', 'dex', 0, 'd6', True)
-longsword = Weapon('Longsword', 'str', 0, 'd8', True)
-longbow = Weapon('Longbow', 'dex', 0, 'd8', False)
-firebolt = Weapon('Firebolt', 'int', 0, 'd10', False)
+shortsword = Weapon('Shortsword', 'dex', 0, '1d6', True, False, 0)
+longsword = Weapon('Longsword', 'str', 0, '1d8', True, False, 0)
+longbow = Weapon('Longbow', 'dex', 0, '2d6', False, True, 0)
+firebolt = Weapon('Firebolt', 'int', 0, '1d10', False, False, 0)
 
-goblin_cleaver = Weapon('Goblin Scimitar', 'dex', 1, 'd10', True)
+goblin_cleaver = Weapon('Goblin Scimitar', 'dex', 1, '2d8', True, False, 0)
 
 robes = Armor('Clothes', 'Light', 10, True)
 breastplate = Armor('Breastplate', 'Medium', 14, True)
 full_plate = Armor('Full Plate', 'Heavy', 18, False)
 
-shield = Shield('Shield')
+shield = Shield('Shield', 2)
 
 gold_pouch = Item('50 gold', 50)
 
