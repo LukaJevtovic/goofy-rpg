@@ -22,12 +22,15 @@ Note that the executables will probably be a couple of versions behind the actua
 3. Populate encounters lists
 4. Add some more dungeons, develop dungeon chains
 5. Add difficulty 2 and 3 encounters
-6. Implement an inventory system
+6. Make inventory management less clunky
 
 ## CREDITS:
 
 Game Mechanics:
 The basis of this game is currently a slightly modified version of fifth edition rules for Dungeons and Dragons, by Wizards of the Coast. Legally I am obliged to include their Open Gaming License, which you can find in the main repository, named 'SRD-OGL_v5.1.pdf'. I plan to further modify and adapt the basic DnD rules for the purposes of the game in the future.
+
+Dungeon Maps:
+All of the dungeon maps that are or will be included in the game were released on [Dyson Logos](https://dysonlogos.blog/maps/commercial-maps/), under a free use license. I've been using this website for my personal DnD games for a long time and highly recommend you check it out!
 
 Music and SFX:
 Music during adventure - created by [ZHRØ on Freesound](https://freesound.org/people/ZHR%C3%98/sounds/527321/)
