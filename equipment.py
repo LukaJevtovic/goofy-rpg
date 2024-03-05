@@ -69,7 +69,7 @@ class Weapon():
         print('damage' + str(damage))
         return damage
     
-    def get_button(self, creature, x, y, scale):
+    def get_button(self, creature, x, y, scale, just_dimensions=False):
 
         font1 = pygame.font.SysFont(None, 35)
         font2 = pygame.font.SysFont(None, 25)
@@ -123,11 +123,14 @@ class Weapon():
         combined_surface.blit(text_surface2, (0,text_height1))
         combined_surface.blit(text_surface3, (text_width2, text_height1))
 
-        total_button = button.ButtonSlow(x,y,combined_surface, scale)
+        if just_dimensions:
+            return combined_surface.get_size()
+
+        total_button = button.Button(x,y,combined_surface, scale)
 
         return total_button
 
-    def get_ButtonOnce(self, creature, x, y, scale):
+    def get_ButtonOnce(self, creature, x, y, scale, just_dimensions=False):
         font1 = pygame.font.SysFont(None, 35)
         font2 = pygame.font.SysFont(None, 25)
 
@@ -179,6 +182,9 @@ class Weapon():
         combined_surface.blit(text_surface1, (0,0))
         combined_surface.blit(text_surface2, (0,text_height1))
         combined_surface.blit(text_surface3, (text_width2, text_height1))
+
+        if just_dimensions:
+            return combined_surface.get_size()
 
         selected_surface = pygame.Surface((total_width, total_height))
         selected_surface.fill((138, 138, 138))
@@ -214,10 +220,160 @@ class Armor():
         elif self.type == 'Heavy':
             return self.ac
         
+    def get_button(self, creature, x, y, scale, just_dimensions=False):
+        font1 = pygame.font.SysFont(None, 35)
+        font2 = pygame.font.SysFont(None, 25)
+
+        text1 = self.name
+        text2 = 'AC: ' + str(self.ac) + ' '
+        text3 = self.type
+
+        text_surface1 = font1.render(text1, True, (0,0,0))
+        text_surface2 = font2.render(text2, True, (0,0,0))
+        text_surface3 = font2.render(text3, True, (0,0,0))
+
+        text_width1, text_height1 = text_surface1.get_size()
+        text_width2, text_height2 = text_surface2.get_size()
+        text_width3, text_height3 = text_surface3.get_size()
+
+        total_width = max(text_width1, text_width2 + text_width3)
+        total_height = text_height1 + text_height2
+
+        combined_surface = pygame.Surface((total_width, total_height))
+        combined_surface.fill((255,255,255))
+
+        combined_surface.blit(text_surface1, (0,0))
+        combined_surface.blit(text_surface2, (0,text_height1))
+        combined_surface.blit(text_surface3, (text_width2, text_height1))
+
+        if just_dimensions:
+            return combined_surface.get_size()
+
+        selected_surface = pygame.Surface((total_width, total_height))
+        selected_surface.fill((138, 138, 138))
+
+        selected_surface.blit(text_surface1, (0,0))
+        selected_surface.blit(text_surface2, (0,text_height1))
+        selected_surface.blit(text_surface3, (text_width2, text_height1))
+
+        total_button = button.Button(x,y,combined_surface, scale)
+
+        return total_button
+        
+    def get_ButtonOnce(self, creature, x, y, scale, just_dimensions=False):
+        font1 = pygame.font.SysFont(None, 35)
+        font2 = pygame.font.SysFont(None, 25)
+
+        text1 = self.name
+        text2 = 'AC: ' + str(self.ac) + ' '
+        text3 = self.type
+
+        text_surface1 = font1.render(text1, True, (0,0,0))
+        text_surface2 = font2.render(text2, True, (0,0,0))
+        text_surface3 = font2.render(text3, True, (0,0,0))
+
+        text_width1, text_height1 = text_surface1.get_size()
+        text_width2, text_height2 = text_surface2.get_size()
+        text_width3, text_height3 = text_surface3.get_size()
+
+        total_width = max(text_width1, text_width2 + text_width3)
+        total_height = text_height1 + text_height2
+
+        combined_surface = pygame.Surface((total_width, total_height))
+        combined_surface.fill((255,255,255))
+
+        combined_surface.blit(text_surface1, (0,0))
+        combined_surface.blit(text_surface2, (0,text_height1))
+        combined_surface.blit(text_surface3, (text_width2, text_height1))
+
+        if just_dimensions:
+            return combined_surface.get_size()
+
+        selected_surface = pygame.Surface((total_width, total_height))
+        selected_surface.fill((138, 138, 138))
+
+        selected_surface.blit(text_surface1, (0,0))
+        selected_surface.blit(text_surface2, (0,text_height1))
+        selected_surface.blit(text_surface3, (text_width2, text_height1))
+
+        total_button = button.ButtonOnce(x,y,combined_surface, selected_surface, scale)
+
+        return total_button
+        
 class Shield():
     def __init__(self, name, ac_bonus):
         self.name = name
         self.ac = ac_bonus
+
+    def get_button(self, creature, x, y, scale, just_dimensions=False):
+        font1 = pygame.font.SysFont(None, 35)
+        font2 = pygame.font.SysFont(None, 25)
+
+        text1 = self.name
+        text2 = '+' + str(self.ac) + ' AC'
+
+        text_surface1 = font1.render(text1, True, (0,0,0))
+        text_surface2 = font2.render(text2, True, (0,0,0))
+
+        text_width1, text_height1 = text_surface1.get_size()
+        text_width2, text_height2 = text_surface2.get_size()
+
+        total_width = max(text_width1, text_width2)
+        total_height = text_height1 + text_height2
+
+        combined_surface = pygame.Surface((total_width, total_height))
+        combined_surface.fill((255,255,255))
+
+        combined_surface.blit(text_surface1, (0,0))
+        combined_surface.blit(text_surface2, (0,text_height1))
+
+        if just_dimensions:
+            return combined_surface.get_size()
+
+        selected_surface = pygame.Surface((total_width, total_height))
+        selected_surface.fill((138, 138, 138))
+
+        selected_surface.blit(text_surface1, (0,0))
+        selected_surface.blit(text_surface2, (0,text_height1))
+
+        total_button = button.Button(x,y,combined_surface, scale)
+
+        return total_button
+
+    def get_ButtonOnce(self, creature, x, y, scale, just_dimensions=False):
+        font1 = pygame.font.SysFont(None, 35)
+        font2 = pygame.font.SysFont(None, 25)
+
+        text1 = self.name
+        text2 = '+' + str(self.ac) + ' AC'
+
+        text_surface1 = font1.render(text1, True, (0,0,0))
+        text_surface2 = font2.render(text2, True, (0,0,0))
+
+        text_width1, text_height1 = text_surface1.get_size()
+        text_width2, text_height2 = text_surface2.get_size()
+
+        total_width = max(text_width1, text_width2)
+        total_height = text_height1 + text_height2
+
+        combined_surface = pygame.Surface((total_width, total_height))
+        combined_surface.fill((255,255,255))
+
+        combined_surface.blit(text_surface1, (0,0))
+        combined_surface.blit(text_surface2, (0,text_height1))
+
+        if just_dimensions:
+            return combined_surface.get_size()
+
+        selected_surface = pygame.Surface((total_width, total_height))
+        selected_surface.fill((138, 138, 138))
+
+        selected_surface.blit(text_surface1, (0,0))
+        selected_surface.blit(text_surface2, (0,text_height1))
+
+        total_button = button.ButtonOnce(x,y,combined_surface, selected_surface, scale)
+
+        return total_button
 
 class Item():
     def __init__(self, name, value):

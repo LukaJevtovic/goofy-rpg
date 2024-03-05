@@ -6,10 +6,10 @@ class Button():
     def __init__(self, x, y, image, scale):
         width = image.get_width()
         height = image.get_height()
-        self.image = pygame.transform.scale(image, (int(width*scale), int(height*scale)))
+        self.image = pygame.transform.smoothscale(image, (int(width*scale), int(height*scale)))
         self.rect = self.image.get_rect()
         self.rect.topleft = (x,y)
-        self.clicked = True
+        self.clicked = False
 
     def draw(self, surface, on=True):
         action = False
@@ -71,12 +71,12 @@ class ButtonOnce():
     def __init__(self, x, y, image, image_selected, scale):
         width = image.get_width()
         height = image.get_height()
-        self.image = pygame.transform.scale(image, (int(width*scale), int(height*scale)))
+        self.image = pygame.transform.smoothscale(image, (int(width*scale), int(height*scale)))
         self.rect = self.image.get_rect()
         self.rect.topleft = (x,y)
         self.clicked = False
 
-        self.image_selected = pygame.transform.scale(image_selected, (int(width*scale), int(height*scale)))
+        self.image_selected = pygame.transform.smoothscale(image_selected, (int(width*scale), int(height*scale)))
         self.rect_selected = self.image_selected.get_rect()
         self.rect_selected.topleft = (x,y)
 

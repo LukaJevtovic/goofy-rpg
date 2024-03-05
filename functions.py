@@ -552,6 +552,25 @@ def inventory_menu(player, screen, clock, SCREEN_WIDTH, SCREEN_HEIGHT):
     armor_selected = False
     shield_selected = False
 
+    #Left hand inventory slot
+    lhand_x = 300
+    lhand_y = 70
+    lhand_rect = pygame.Rect(scale*(lhand_x), scale*(lhand_y), 200, 130)
+    lhand_text = pygame.font.SysFont(None, 40).render('LEFT HAND', True, (0,0,0))
+
+    #Right hand inventory slot
+    rhand_x = lhand_x + 220
+    rhand_y = 70
+    rhand_rect = pygame.Rect(scale*(rhand_x), scale*(rhand_y), 200, 130)
+    rhand_text = pygame.font.SysFont(None, 40).render('RIGHT HAND', True, (0,0,0))
+
+    #Armor inventory slot
+    armor_x = rhand_x + 220
+    armor_y = 70
+    armor_rect = pygame.Rect(scale*(armor_x), scale*(armor_y), 200, 130)
+    armor_selected_rect = pygame.Rect(scale*(armor_x), scale*(armor_y), 250, 162.5)
+    armor_text = pygame.font.SysFont(None, 40).render('ARMOR', True, (0,0,0))
+
     while inventorying and not quitting:
 
         for event in pygame.event.get():
@@ -562,51 +581,197 @@ def inventory_menu(player, screen, clock, SCREEN_WIDTH, SCREEN_HEIGHT):
                 if event.key == pygame.K_i:
                     inventorying = False
 
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+
         screen.fill((229,203,186))
         health_bar(player, scale*20, scale*20, 0, (255,255,255), screen)
         xp_bar(player, scale*20, scale*20, (255,255,255), screen)
         mana_bar(player, scale*20, scale*70, (255,255,255), screen)
-        draw_text('Inventory', pygame.font.SysFont(None, 50), (0,0,0), 500, 30, screen)
-        draw_text('Equipped w')
+        draw_text('Equipped', pygame.font.SysFont(None, 50), (0,0,0), 500, 30, screen)
 
-        #Draw inventory slots
-        i=0
-        j=0
-        x=50
-        y=500
-        dx = 20
-        dy = 80
-        while i<12:
-            if i<player.inventory_size:
-                pygame.draw.rect(screen, (74,5,44), pygame.Rect(scale*(x + j*(150+dx)), scale*y, 150,50), width=4)
-                j+=1
-
-                if j == 4:
-                    y+=dy
-                    j=0
-
-            else:
-                pygame.draw.rect(screen, (138,138,138), pygame.Rect(scale*(x + j*(150+dx)), scale*y, 150,50), width=0)
-                j+=1
-
-                if j == 4:
-                    y+=dy
-                    j=0
-
-            i+=1
+        #TODO: Draw spells starting from around y=250 and x=700 (like a one column list on the right side of the screen)
 
         #Draw equippable slots differently depending on which item is currently held
-        #if not all(weapon_selected, armor_selected, shield_selected):
+        if weapon_selected == False and armor_selected == False and shield_selected == False:
+
+            #Draw inventory slots
+            i=0
+            j=0
+            x=50
+            y=580
+            dx = 20
+            dy = 80
+
+            draw_text('Inventory', pygame.font.SysFont(None, 50), (0,0,0), x, y-40, screen)
+
+            while i<12:
+                if i<player.inventory_size:
+                    pygame.draw.rect(screen, (74,5,44), pygame.Rect(scale*(x + j*(150+dx)), scale*y, 150,50), width=4)
+
+                    #Draw inventory button
+                    if i<len(player.inventory):
+                        item = player.inventory[i]
+                        img_width, img_height = item.get_ButtonOnce(player, scale*(x + j*(150+dx)), scale*y, 1, just_dimensions=True)
+                        rescale = find_scale_factor(150 - 8, 50 - 8, img_width, img_height)
+                        button = item.get_ButtonOnce(player, scale*(x + j*(150+dx)) + 4, scale*y + 4, rescale)
+                        if button.draw(screen):
+                            if isinstance(item, equipment.Armor):
+                                armor_selected = True
+                                skip_index = i
+                                selected_item = item
+                                break
+
+                    j+=1
+
+                    if j == 4:
+                        y+=dy
+                        j=0
+
+                else:
+                    pygame.draw.rect(screen, (138,138,138), pygame.Rect(scale*(x + j*(150+dx)), scale*y, 150,50), width=0)
+                    j+=1
+
+                    if j == 4:
+                        y+=dy
+                        j=0
+
+                i+=1
+            
+            #left hand            
+            pygame.draw.rect(screen, (74,5,44), lhand_rect, width=5)
+            screen.blit(lhand_text, (scale*(lhand_x+5), scale*(lhand_y + 5)))
+            if player.left_hand != None:
+                img_width, img_height = player.left_hand.get_ButtonOnce(player, scale*(lhand_x + 5), scale*(lhand_y + 5), 1, just_dimensions=True)
+                rescale = find_scale_factor(200 - 10, 130 - 10 - 30, img_width, img_height)
+                button_lhand = player.left_hand.get_ButtonOnce(player, scale*(lhand_x + 5), scale*(lhand_y + 5 + 30), rescale)
+                if button_lhand.draw(screen):
+                    if len(player.inventory)<player.inventory_size:
+                        player.inventory.append(player.left_hand)
+                        player.left_hand = None
+
+            #right hand            
+            pygame.draw.rect(screen, (74,5,44), rhand_rect, width=5)
+            screen.blit(rhand_text, (scale*(rhand_x+5), scale*(rhand_y + 5)))
+            if player.right_hand != None:
+                img_width, img_height = player.right_hand.get_ButtonOnce(player, scale*(rhand_x + 5), scale*(rhand_y + 5), 1, just_dimensions=True)
+                rescale = find_scale_factor(200 - 10, 130 - 10 - 30, img_width, img_height)
+                button_rhand = player.right_hand.get_ButtonOnce(player, scale*(rhand_x + 5), scale*(rhand_y + 5 + 30), rescale)
+                if button_rhand.draw(screen):
+                    if len(player.inventory)<player.inventory_size:
+                        player.inventory.append(player.right_hand)
+                        player.right_hand = None
+
+
+            #armor            
+            pygame.draw.rect(screen, (74,5,44), armor_rect, width=5)
+            screen.blit(armor_text, (scale*(armor_x+5), scale*(armor_y + 5)))
+            if player.armor != None:
+                img_width, img_height = player.armor.get_ButtonOnce(player, scale*(armor_x + 5), scale*(armor_y + 5), 1, just_dimensions=True)
+                rescale = find_scale_factor(200 - 10, 130 - 10 - 30, img_width, img_height)
+                button_armor = player.armor.get_ButtonOnce(player, scale*(armor_x + 5), scale*(armor_y + 5 + 30), rescale)
+                if button_armor.draw(screen):
+                    if len(player.inventory)<player.inventory_size:
+                        player.inventory.append(player.armor)
+                        player.armor = None
+
+        #Armor is selected
+        if armor_selected:
+
+            big_button = selected_item.get_ButtonOnce(player, 50, 250, 3)
+            if big_button.draw(screen):
+                armor_selected = False
+
+            #Draw inventory slots
+            i=0
+            j=0
+            x=50
+            y=580
+            dx = 20
+            dy = 80
+
+            draw_text('Inventory', pygame.font.SysFont(None, 50), (0,0,0), x, y-40, screen)
+
+            while i<12:
+                if i<player.inventory_size:
+                    pygame.draw.rect(screen, (74,5,44), pygame.Rect(scale*(x + j*(150+dx)), scale*y, 150,50), width=4)
+
+                    #Draw inventory button
+                    if i<len(player.inventory):
+                        if i!=skip_index:
+                            item = player.inventory[i]
+                            img_width, img_height = item.get_ButtonOnce(player, scale*(x + j*(150+dx)), scale*y, 1, just_dimensions=True)
+                            rescale = find_scale_factor(150 - 8, 50 - 8, img_width, img_height)
+                            button = item.get_ButtonOnce(player, scale*(x + j*(150+dx)) + 4, scale*y + 4, rescale)
+                            if button.draw(screen):
+                                if isinstance(item, equipment.Armor):
+                                    armor_selected = True
+                                    skip_index = i
+                                    selected_item = item
+                                    break
+                    j+=1
+                    if j == 4:
+                        y+=dy
+                        j=0
+                else:
+                    pygame.draw.rect(screen, (138,138,138), pygame.Rect(scale*(x + j*(150+dx)), scale*y, 150,50), width=0)
+                    j+=1
+                    if j == 4:
+                        y+=dy
+                        j=0
+                i+=1
+
+            #left hand
+            pygame.draw.rect(screen, (138,138,138), lhand_rect, width=0)
+            screen.blit(lhand_text, (scale*(lhand_x+5), scale*(lhand_y + 5)))
+            if player.left_hand != None:
+                img_width, img_height = player.left_hand.get_ButtonOnce(player, scale*(lhand_x + 5), scale*(lhand_y + 5), 1, just_dimensions=True)
+                rescale = find_scale_factor(200 - 10, 130 - 10 - 30, img_width, img_height)
+                button_lhand = player.left_hand.get_ButtonOnce(player, scale*(lhand_x + 5), scale*(lhand_y + 5 + 30), rescale)
+                button_lhand.clicked = True
+                button_lhand.draw(screen)
+
+            #right hand
+            pygame.draw.rect(screen, (138,138,138), rhand_rect, width=0)
+            screen.blit(rhand_text, (scale*(rhand_x+5), scale*(rhand_y + 5)))
+            if player.right_hand != None:
+                img_width, img_height = player.right_hand.get_ButtonOnce(player, scale*(rhand_x + 5), scale*(rhand_y + 5), 1, just_dimensions=True)
+                rescale = find_scale_factor(200 - 10, 130 - 10 - 30, img_width, img_height)
+                button_rhand = player.right_hand.get_ButtonOnce(player, scale*(rhand_x + 5), scale*(rhand_y + 5 + 30), rescale)
+                button_rhand.clicked = True
+                button_rhand.draw(screen)
+
+            #armor
+            pygame.draw.rect(screen, (74,5,44), armor_selected_rect, width=6)
+            screen.blit(armor_text, (scale*(armor_x+5), scale*(armor_y + 5)))
+            if armor_selected_rect.collidepoint(mouse_x, mouse_y):
+                if pygame.mouse.get_pressed()[0] == 1:
+                    current_armor = player.armor
+                    if current_armor != None:
+                        player.armor = selected_item
+                        player.inventory.pop(skip_index)
+                        player.inventory.append(current_armor)
+                    else:
+                        player.armor = selected_item
+                        player.inventory.pop(skip_index)
+                    armor_selected = False
+            
 
         
 
-
+        
 
 
         pygame.display.update()
         clock.tick(60)
 
 
+def find_scale_factor(rect_width, rect_height, img_width, img_height):
+    scale_width = rect_width/img_width
+    scale_height = rect_height/img_height
+
+    scale_factor = min(scale_width, scale_height)
+
+    return scale_factor
 
 
 
