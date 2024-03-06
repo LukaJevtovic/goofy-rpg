@@ -131,3 +131,42 @@ class ButtonOnceLR():
                 return 2
 
         return action
+    
+class SpellButton():
+    def __init__(self, x, y, image, image_selected, desc_img, desc_x, desc_y, desc_scale, scale):
+        width = image.get_width()
+        height = image.get_height()
+        self.image = pygame.transform.smoothscale(image, (int(width*scale), int(height*scale)))
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (x,y)
+        self.clicked = False
+
+        self.image_selected = pygame.transform.smoothscale(image_selected, (int(width*scale), int(height*scale)))
+        self.rect_selected = self.image_selected.get_rect()
+        self.rect_selected.topleft = (x,y)
+
+        desc_width = desc_img.get_width()
+        desc_height = desc_img.get_height()
+        self.desc_img = pygame.transform.smoothscale(desc_img, (int(desc_width*desc_scale), int(desc_height*desc_scale)))
+        self.desc_rect = self.desc_img.get_rect()
+        self.desc_rect.topleft = (desc_x, desc_y)
+
+    def draw(self, surface):
+        action = False
+        position = pygame.mouse.get_pos()
+
+        if self.clicked:
+            surface.blit(self.image_selected, (self.rect_selected.x, self.rect_selected.y))
+        else:
+            surface.blit(self.image, (self.rect.x, self.rect.y))
+
+        if self.rect.collidepoint(position):
+
+            surface.blit(self.desc_img, (self.desc_rect.x, self.desc_rect.y))
+
+            if pygame.mouse.get_pressed()[0] == 1:
+                self.clicked = not self.clicked
+                action = True
+                pygame.time.wait(200)
+
+        return action

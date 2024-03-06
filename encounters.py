@@ -4,6 +4,8 @@ import creatures
 import functions
 import numpy as np
 
+stat_modifier = {1:'-5', 2:'-4', 3:'-4', 4:'-3', 5:'-3', 6:'-2', 7:'-2', 8:'-1', 9:'-1', 10:'+0', 11:'+0', 12:'+1', 13:'+1', 14:'+2', 15:'+2', 16:'+3', 17:'+3', 18:'+4', 19:'+4', 20:'+5', 21:'+5', 22:'+6', 23:'+6', 24:'+7', 25:'+7'}
+
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 800
 
@@ -48,7 +50,7 @@ class combat_regular():
                 
         surface.blit(self.image, (self.rect.x, self.rect.y))
 
-    def begin(self, player, screen, stat_font, text_col, font, clock):
+    def begin(self, player, screen, stat_font, text_col, font, clock, run):
 
         COMBAT1, irrelevant = initiate_encounter_lists()
 
@@ -59,9 +61,45 @@ class combat_regular():
                 j=0
             ENEMIES = COMBAT1[j]
 
-        functions.combat(player, ENEMIES, screen, stat_font, text_col, font, clock)
+        functions.combat(player, ENEMIES, screen, stat_font, text_col, font, clock, run)
 
         if player.alive:
+
+            if player.dnd_class == 'fighter':
+
+                if int(stat_modifier[player.con])>0:
+                    con_bonus = int(stat_modifier[player.con])
+                else:
+                    con_bonus = 0
+
+                if player.hp+1+con_bonus >= player.max_hp:
+                    player.hp = player.max_hp
+                else:
+                    player.hp+=1+con_bonus
+
+                if int(stat_modifier[player.wis])>0:
+                    wis_bonus = int(stat_modifier[player.wis])
+                else:
+                    wis_bonus = 0
+                if player.mp+1+wis_bonus>=player.max_mp:
+                    player.mp = player.max_mp
+                else:
+                    player.mp+=1+wis_bonus
+
+
+            elif player.dnd_class == 'wizard':
+
+                if int(stat_modifier[player.wis])>0:
+                    wis_bonus = int(stat_modifier[player.wis])
+                else:
+                    wis_bonus = 0
+
+                if player.mp+5+wis_bonus>=player.max_mp:
+                    player.mp = player.max_mp
+                else:
+                    player.mp+=5+wis_bonus
+
+
             functions.loot_menu(player, self.difficulty, screen, clock)
 
 
@@ -107,7 +145,7 @@ class combat_boss():
 
         surface.blit(self.image, (self.rect.x, self.rect.y))
 
-    def begin(self, player, screen, stat_font, text_col, font, clock):
+    def begin(self, player, screen, stat_font, text_col, font, clock, run):
         irrelevant, COMBAT_BOSS = initiate_encounter_lists()
 
         if len(COMBAT_BOSS)>1:
@@ -117,9 +155,43 @@ class combat_boss():
 
         ENEMIES = COMBAT_BOSS[j]
 
-        functions.combat(player, ENEMIES, screen, stat_font, text_col, font, clock)
+        functions.combat(player, ENEMIES, screen, stat_font, text_col, font, clock, run)
 
         if player.alive:
+            if player.dnd_class == 'fighter':
+
+                if int(stat_modifier[player.con])>0:
+                    con_bonus = int(stat_modifier[player.con])
+                else:
+                    con_bonus = 0
+
+                if player.hp+1+con_bonus >= player.max_hp:
+                    player.hp = player.max_hp
+                else:
+                    player.hp+=1+con_bonus
+
+                if int(stat_modifier[player.wis])>0:
+                    wis_bonus = int(stat_modifier[player.wis])
+                else:
+                    wis_bonus = 0
+                if player.mp+1+wis_bonus>=player.max_mp:
+                    player.mp = player.max_mp
+                else:
+                    player.mp+=1+wis_bonus
+
+
+            elif player.dnd_class == 'wizard':
+
+                if int(stat_modifier[player.wis])>0:
+                    wis_bonus = int(stat_modifier[player.wis])
+                else:
+                    wis_bonus = 0
+
+                if player.mp+5+wis_bonus>=player.max_mp:
+                    player.mp = player.max_mp
+                else:
+                    player.mp+=5+wis_bonus
+
             functions.loot_menu(player, 4, screen, clock)
 
 
@@ -165,7 +237,7 @@ class event_regular():
 
         surface.blit(self.image, (self.rect.x, self.rect.y))
 
-    def begin(self, player, screen, stat_font, text_col, font, clock):
+    def begin(self, player, screen, stat_font, text_col, font, clock, run):
         
         for event in pygame.event.get():
 
@@ -195,3 +267,4 @@ def initiate_encounter_lists():
     return COMBAT1, COMBAT_BOSS
 
 
+#

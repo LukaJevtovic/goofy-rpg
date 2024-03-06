@@ -6,6 +6,7 @@ import equipment
 import creatures
 import encounters
 import dungeons
+import spellbook
 pygame.init()
 
 #Screen setup
@@ -92,10 +93,10 @@ wizard_img = pygame.image.load('Pictures/wizard.png').convert_alpha()
 wizard_selected_img = pygame.image.load('Pictures/wizard_selected.png').convert_alpha()
 
 #Buttons
-fighter_button = button.ButtonSlow(500, 100, fighter_img, 0.4)
-fighter_selected_button = button.ButtonSlow(500,100,fighter_selected_img, 0.4)
-wizard_button = button.ButtonSlow(500, 400, wizard_img, 0.4)
-wizard_selected_button = button.ButtonSlow(500,400,wizard_selected_img,0.4)
+fighter_button = button.ButtonSlow(700, 30, fighter_img, 0.4)
+fighter_selected_button = button.ButtonSlow(700,30,fighter_selected_img, 0.4)
+wizard_button = button.ButtonSlow(700, 130, wizard_img, 0.4)
+wizard_selected_button = button.ButtonSlow(700,130,wizard_selected_img,0.4)
 
 #EQUIPMENT SELECT --------------------------------------------------------------------------------------------------------------
 
@@ -494,7 +495,9 @@ while run:
             if fighter_selected or wizard_selected:
 
                 if fighter_selected:
-                    functions.draw_text('Longsword + Shield OR Longbow + Arrows', font, text_col, 100, 650, screen)
+                    functions.draw_text('HP: 10 + CON base, 6 + CON per level', font, text_col, 50, 300, screen)
+                    functions.draw_text('MP: 2 + WIS base, 2 + WIS per level', font, text_col, 50, 330, screen)
+                    functions.text_wrap('After each combat encounter, regain 1+CON(if positive) health', font, text_col, screen, 50, 360, 600)
                     if fighter_selected_button.draw(screen):
                         fighter_selected = False
                         player.hp = 0 + int(stat_modifier[player.con])
@@ -504,7 +507,9 @@ while run:
                         player.hp = 6 + int(stat_modifier[player.con])
 
                 if wizard_selected:
-                    functions.draw_text('Firebolt (#TODO: Spells)', font, text_col, 100, 650, screen)
+                    functions.draw_text('HP: 6 + CON base, 4 + CON per level', font, text_col, 50, 300, screen)
+                    functions.draw_text('MP: 10 + WIS base, 10 + WIS per level', font, text_col, 50, 330, screen)
+                    functions.text_wrap('After each combat encounter, regain 5+WIS(if positive) mana', font, text_col, screen, 50, 360, 600)
                     if fighter_button.draw(screen):
                         wizard_selected = False
                         fighter_selected = True
@@ -593,23 +598,27 @@ while run:
 
                 if not fighter_longbow and not fighter_longsword:
                     if longsword_button.draw(screen):
+                        player.spells = []
                         if player.left_hand != equipment.shield:
                             player.left_hand = equipment.shield
                         if player.right_hand != equipment.longsword:
                             player.right_hand = equipment.longsword
                         fighter_longsword = True
                     if longbow_button.draw(screen):
+                        player.spells = []
                         player.left_hand = None
                         player.right_hand = equipment.longbow
                         fighter_longbow = True
 
                 if fighter_longsword:
                     if longsword_selected_button.draw(screen):
+                        player.spells = []
                         player.right_hand = None
                         player.left_hand = None
                         fighter_longsword = False
 
                     if longbow_button.draw(screen):
+                        player.spells = []
                         player.right_hand = equipment.longbow
                         player.left_hand = None
                         fighter_longsword = False
@@ -619,10 +628,12 @@ while run:
                     if longsword_button.draw(screen):
                         player.right_hand = equipment.longsword
                         player.left_hand = equipment.shield
+                        player.spells = []
                         fighter_longbow = False
                         fighter_longsword = True
 
                     if longbow_selected_button.draw(screen):
+                        player.spells = []
                         player.right_hand = None
                         fighter_longbow = False
 
@@ -632,12 +643,13 @@ while run:
                     player.armor = equipment.robes
                 if not wizard_firebolt:
                     if firebolt_button.draw(screen):
-                        player.right_hand = equipment.firebolt
+                        player.spells.append(spellbook.firebolt)
+                        player.spells.append(spellbook.fire_breath)
                         wizard_firebolt = True
                     
                 if wizard_firebolt:
                     if firebolt_selected_button.draw(screen):
-                        player.right_hand = None
+                        player.spells = []
                         wizard_firebolt = False
                     
 
@@ -647,6 +659,7 @@ while run:
                 player.armor = None
                 player.left_hand  = None
                 player.right_hand = None
+                player.spells = []
                 fighter_longbow = False
                 fighter_longsword = False
                 wizard_firebolt = False
@@ -797,7 +810,7 @@ while run:
             functions.draw_text(player.armor.name, stat_font, text_col, 50, 340 + j*dy, screen)
 
 
-        DUNGEONS[0].draw(screen, player, stat_font, text_col, font, clock) and player.alive
+        DUNGEONS[0].draw(screen, player, stat_font, text_col, font, clock, run)
             #pygame.time.wait(2000)
             #dungeon2 = True
             #dungeon1 = False

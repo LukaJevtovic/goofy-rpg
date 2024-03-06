@@ -23,13 +23,17 @@ class Player():
         self.wis = 8
         self.cha = 8
 
-        self.hp = self.max_hp
         self.left_hand = None
         self.armor = None
         self.right_hand = None
         self.inventory_size = 6
         self.inventory = []
         self.gold = 0
+
+        self.spell_slots = 0
+        self.spells = []
+
+        self.hp = self.max_hp
         self.alive = True
 
     def xp_to_lvlup(self):

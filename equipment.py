@@ -42,7 +42,6 @@ class Weapon():
                 atk_bonus+=1
         
         atk_dice = functions.d20(advantage, disadvantage)
-        print(atk_dice)
 
         if atk_dice == 20:
             crit = True
@@ -66,7 +65,6 @@ class Weapon():
             if creature.race == 'elf' and not self.melee:
                 damage+=1
 
-        print('damage' + str(damage))
         return damage
     
     def get_button(self, creature, x, y, scale, just_dimensions=False):
@@ -542,22 +540,10 @@ class Item():
         return total_button
 
 
-
-
-
-class Spell():
-    def __init__(self, mana_cost, spell_level, offensive):
-        self.mana_cost = mana_cost
-        self.level = spell_level
-        self.offensive = offensive
-
-
-
-
 shortsword = Weapon('Shortsword', 'dex', 0, '1d6', True, False, 0)
 longsword = Weapon('Longsword', 'str', 0, '1d8', True, False, 0)
 longbow = Weapon('Longbow', 'dex', 0, '2d6', False, True, 0)
-firebolt = Weapon('Firebolt', 'int', 0, '1d10', False, False, 0)
+#firebolt = Weapon('Firebolt', 'int', 0, '1d10', False, False, 0)
 
 goblin_cleaver = Weapon('Goblin Scimitar', 'dex', 1, '2d8', True, False, 0)
 

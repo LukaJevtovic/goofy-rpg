@@ -31,7 +31,7 @@ class Dungeon():
         self.rect = self.image.get_rect()
         self.rect.center = (x,y)
 
-    def draw(self, screen, player, stat_font, text_col, font, clock):
+    def draw(self, screen, player, stat_font, text_col, font, clock, run):
         
         screen.blit(self.image, (self.rect.x, self.rect.y))
 
@@ -39,7 +39,7 @@ class Dungeon():
         while i < len(self.EVENTS):
 
             if self.EVENTS[i].draw(screen):
-                self.EVENTS[i].begin(player, screen, stat_font, text_col, font, clock)
+                self.EVENTS[i].begin(player, screen, stat_font, text_col, font, clock, run)
                 self.completeness[i] = True
             
             i+=1

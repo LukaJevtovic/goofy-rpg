@@ -1,6 +1,7 @@
 import pygame
 import button
 import equipment
+import spellbook
 import numpy as np
 
 stat_modifier = {1:'-5', 2:'-4', 3:'-4', 4:'-3', 5:'-3', 6:'-2', 7:'-2', 8:'-1', 9:'-1', 10:'+0', 11:'+0', 12:'+1', 13:'+1', 14:'+2', 15:'+2', 16:'+3', 17:'+3', 18:'+4', 19:'+4', 20:'+5', 21:'+5', 22:'+6', 23:'+6', 24:'+7', 25:'+7'}
@@ -40,6 +41,30 @@ def text_wrap(text, font, color, surface, x, y, max_width):
         surface.blit(text_surface, text_rect)
         y_offset += font.size(line)[1]
 
+def text_wrap_surface(text, font, color, max_width):
+    words = text.split(' ')
+    lines = []
+    line = ''
+    for word in words:
+        test_line = line + word + ' '
+        if font.size(test_line)[0] < max_width:
+            line = test_line
+        else:
+            lines.append(line)
+            line = word + ' '
+    lines.append(line)
+    total_height = sum(font.size(line)[1] for line in lines)
+    surface = pygame.Surface((max_width, total_height), pygame.SRCALPHA)
+    y_offset = 0
+    for line in lines:
+        text_surface = font.render(line, True, color)
+        text_rect = text_surface.get_rect()
+        text_rect.topleft = (0, y_offset)
+        surface.blit(text_surface, text_rect)
+        y_offset += font.size(line)[1]
+    return surface
+
+
 def dice_sound():
     i = np.random.randint(1,7)
     sound_name = 'Sounds/dice_roll_' + str(i) + '.wav'
@@ -56,7 +81,7 @@ def d20(disadvantage=False, advantage=False):
         number = max([np.random.randint(1,21), np.random.randint(1,21)])
     return number
 
-def combat(player, ENEMIES, screen, stat_font, text_col, font, clock):
+def combat(player, ENEMIES, screen, stat_font, text_col, font, clock, run):
 
     #Attack button
     attack_img = pygame.image.load('Pictures/attack.png').convert_alpha()
@@ -75,21 +100,40 @@ def combat(player, ENEMIES, screen, stat_font, text_col, font, clock):
     sorted_initiatives = sorted(all_initiatives, key=lambda x: x[0], reverse=True)
 
     
-    WPN_BUTTONS = []
-    x = 20
-    y = 600
-    i=0
-    
-    WPN_BUTTONS.append(player.right_hand.get_button(player, x+i*200, y, 1))
-        
-    quitting = False
-
     #Position of log lines
     log_x = 20
     log_y = 110
     #Position of initiative lines
     init_x = 600
     init_y = 50
+
+    WPN_BUTTONS = []
+    SPELL_BUTTONS = []
+    x = 20
+    y = 600
+    i=0
+    
+    if isinstance(player.right_hand, equipment.Weapon):
+        WPN_BUTTONS.append(player.right_hand.get_button(player, x+i*200, y, 1))
+        i+=1
+    if isinstance(player.left_hand, equipment.Weapon):
+        WPN_BUTTONS.append(player.left_hand.get_button(player, x+i*200, y, 1))
+        i+=1
+
+    for spell in player.spells:
+        if x+i*200 <= 800:
+            SPELL_BUTTONS.append(spell.get_button(x+i*200, y, 1.5, 500, log_x, log_y, 1))
+            i+=1
+        else:
+            y+=100
+            i=0
+            SPELL_BUTTONS.append(spell.get_button(x+i*200, y, 1.5, 500, log_x, log_y, 1))
+            i+=1
+
+        
+    quitting = False
+
+    
     
     while len(sorted_initiatives)>1 and player.alive==True and not quitting:
 
@@ -106,7 +150,6 @@ def combat(player, ENEMIES, screen, stat_font, text_col, font, clock):
 
 
         screen.fill((229,203,186))
-        #draw_text('Health: ' + str(player.hp), font, text_col, 50, 230, screen)
         
         health_bar(player, 20, 20, 0, (255,255,255), screen)
         xp_bar(player, 20, 20, (255,255,255), screen)
@@ -133,14 +176,20 @@ def combat(player, ENEMIES, screen, stat_font, text_col, font, clock):
         #Player turn
         selected_enemy = -1
         selected_weapon = -1
+        selected_spell = False
+
         locked_in = False
 
         
         if sorted_initiatives[0][1].name == player.name:
 
-            while (selected_enemy == -1 or selected_weapon == -1 or locked_in==False) and not quitting:
+            while not locked_in and not quitting:
 
                 for event in pygame.event.get():
+                    #Quit check
+                    if event.type == pygame.QUIT:
+                        run = False
+                        quitting = True
 
                     #Pause check
                     if event.type == pygame.KEYDOWN:
@@ -152,10 +201,7 @@ def combat(player, ENEMIES, screen, stat_font, text_col, font, clock):
                         elif event.key == pygame.K_3:
                             if len(sorted_initiatives)>3:
                                 selected_enemy = 3
-                    #Quit check
-                    if event.type == pygame.QUIT:
-                        run = False
-                        quitting = True
+                    
 
                 screen.fill((229,203,186))
                 
@@ -182,37 +228,53 @@ def combat(player, ENEMIES, screen, stat_font, text_col, font, clock):
                     i+=1
 
                 if selected_enemy == -1:
-                    draw_text('Select enemy to attack! [Buttons 1-' + str(len(sorted_initiatives)-1) + ']', font, text_col, log_x, log_y + 180, screen)
+                    draw_text('Select enemy to attack! [Buttons 1-' + str(len(sorted_initiatives)-1) + ']', font, text_col, log_x, log_y + 300, screen)
                 else:
-                    draw_text('Selected enemy: ' + str(selected_enemy),font, text_col, log_x, log_y + 180, screen)
+                    draw_text('Selected enemy: ' + str(selected_enemy),font, text_col, log_x, log_y + 300, screen)
 
-                if selected_weapon == -1:
-                    draw_text('Choose an attack!', font, text_col, log_x, log_y + 210, screen)
-                else:
-                    draw_text('Chosen attack: ' + player.right_hand.name, font, text_col, log_x, log_y + 210, screen)
+                if selected_weapon == -1 and selected_spell == False:
+                    draw_text('Choose an attack!', font, text_col, log_x, log_y + 330, screen)
+                elif selected_weapon == 0:
+                    draw_text('Chosen attack: ' + player.right_hand.name, font, text_col, log_x, log_y + 330, screen)
+                elif selected_weapon == 1:
+                    draw_text('Chosen attack: ' + player.left_hand.name, font, text_col, log_x, log_y + 330, screen)
+                elif selected_spell:
+                    draw_text('Chosen attack: ' + spell.name, font, text_col, log_x, log_y + 330, screen)
 
                 for wpn_button in WPN_BUTTONS:
                     if wpn_button.draw(screen):
                         selected_weapon = WPN_BUTTONS.index(wpn_button)
 
+                i=0
+                while i < len(SPELL_BUTTONS):
+                    if SPELL_BUTTONS[i].draw(screen):
+                        if player.mp >= player.spells[i].mana_cost:
+                            selected_spell = True
+                            spell = player.spells[i]
+                        else:
+                            draw_text('You don\'t have enough mana!', font, text_col, log_x, log_y + 270, screen)
+                            pygame.display.update()
+                            pygame.time.wait(1000)
+                    i+=1
+
                 if selected_weapon != -1 and selected_enemy != -1:
                     if attack_button.draw(screen):
                         locked_in = True
 
-
+                if selected_spell and selected_enemy != -1:
+                    if attack_button.draw(screen):
+                        locked_in = True 
                 pygame.display.update()
                 clock.tick(60)
-                        
+
             
-
-            if selected_enemy != -1:
-                #TODO: Add option for selecting a weapon/spell from inventory to use in the attack
-                selected_weapon = 0
-
-                
-
+            if selected_weapon == 0 or selected_weapon == 1:
                 dice_sound()
-                attack_roll, crit = player.right_hand.attack_roll(player)
+                if selected_weapon == 0:
+                    attack_roll, crit = player.right_hand.attack_roll(player)
+                elif selected_weapon == 1:
+                    attack_roll, crit = player.left_hand.attack_roll(player)
+
 
                 if attack_roll >= sorted_initiatives[selected_enemy][1].ac:
 
@@ -233,7 +295,7 @@ def combat(player, ENEMIES, screen, stat_font, text_col, font, clock):
                         
                     else:
                         draw_text(str(sorted_initiatives[selected_enemy][1].name) + ' falls!', font, text_col, log_x, log_y + 90, screen)
-                        
+                            
                         if player.race == 'human':
                             draw_text('You gain ' + str(int(1.1*sorted_initiatives[selected_enemy][1].xp)) + ' xp!', font, text_col, log_x, log_y + 120, screen)
                             player.xp += int(1.1*sorted_initiatives[selected_enemy][1].xp)
@@ -249,20 +311,19 @@ def combat(player, ENEMIES, screen, stat_font, text_col, font, clock):
                     draw_text('You miss!',font, text_col, log_x, log_y + 30, screen)
                     pygame.display.update()
                     pygame.time.wait(2500)
-                
+                    
                 sorted_initiatives.append(sorted_initiatives.pop(0))
+
+            elif selected_spell:
+                spell.spell_function(player, sorted_initiatives, selected_enemy, font, text_col, log_x, log_y, screen)
+
 
 
 
         #Enemy turn
             
         else:
-
-            
             enemy = sorted_initiatives[0][1]
-
-            #draw_text('Attack roll:     vs.' + str(player.ac()) + 'AC', font, text_col, 100, 30, screen)
-            #pygame.time.wait(2500)
 
             dice_sound()
             attack_roll, crit = enemy.weapon.attack_roll(enemy)
@@ -993,9 +1054,10 @@ def inventory_menu(player, screen, clock, SCREEN_WIDTH, SCREEN_HEIGHT):
                         player.left_hand = selected_item
                         player.inventory.pop(skip_index)
 
-                    if player.right_hand.two_handed:
-                        player.inventory.append(player.right_hand)
-                        player.right_hand = None
+                    if player.right_hand!=None:
+                        if player.right_hand.two_handed:
+                            player.inventory.append(player.right_hand)
+                            player.right_hand = None
                     
                     OH_weapon_selected = False
 
