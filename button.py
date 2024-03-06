@@ -84,15 +84,50 @@ class ButtonOnce():
         action = False
         position = pygame.mouse.get_pos()
 
+        if self.clicked:
+            surface.blit(self.image_selected, (self.rect_selected.x, self.rect_selected.y))
+        else:
+            surface.blit(self.image, (self.rect.x, self.rect.y))
+
         if self.rect.collidepoint(position):
             if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
                 self.clicked = True
                 action = True
                 pygame.time.wait(200)
 
+        return action
+    
+class ButtonOnceLR():
+    def __init__(self, x, y, image, image_selected, scale):
+        width = image.get_width()
+        height = image.get_height()
+        self.image = pygame.transform.smoothscale(image, (int(width*scale), int(height*scale)))
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (x,y)
+        self.clicked = False
+
+        self.image_selected = pygame.transform.smoothscale(image_selected, (int(width*scale), int(height*scale)))
+        self.rect_selected = self.image_selected.get_rect()
+        self.rect_selected.topleft = (x,y)
+
+    def draw(self, surface):
+        action = False
+        position = pygame.mouse.get_pos()
+
         if self.clicked:
             surface.blit(self.image_selected, (self.rect_selected.x, self.rect_selected.y))
         else:
             surface.blit(self.image, (self.rect.x, self.rect.y))
+
+        if self.rect.collidepoint(position):
+            if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                self.clicked = True
+                action = True
+                pygame.time.wait(200)
+                return True
+            elif pygame.mouse.get_pressed()[2] == 1 and self.clicked == False:
+                self.clicked = True
+                pygame.time.wait(200)
+                return 2
 
         return action

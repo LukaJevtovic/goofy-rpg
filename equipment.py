@@ -197,6 +197,74 @@ class Weapon():
         total_button = button.ButtonOnce(x,y,combined_surface, selected_surface, scale)
 
         return total_button
+    
+    def get_ButtonOnceLR(self, creature, x, y, scale, just_dimensions=False):
+        font1 = pygame.font.SysFont(None, 35)
+        font2 = pygame.font.SysFont(None, 25)
+
+        text1 = self.name
+
+        atk_bonus = int(stat_modifier[getattr(creature, self.stat, None)]) + creature.proficiency_bonus()
+        if creature.name == 'Player':
+            if creature.race == 'orc' and self.melee:
+                atk_bonus+=1
+            if creature.race == 'elf' and not self.melee:
+                atk_bonus+=1
+
+        if atk_bonus>=0:
+            text2 = 'ATK: ' + '+' + str(atk_bonus)
+        else:
+            text2 = 'ATK: ' + str(atk_bonus)
+
+
+        dmg_bonus = int(stat_modifier[getattr(creature, self.stat, None)])
+        if creature.name == 'Player':
+            if creature.race == 'orc' and self.melee:
+                dmg_bonus+=1
+            if creature.race == 'elf' and not self.melee:
+                dmg_bonus+=1
+
+        if dmg_bonus>=0:
+            text3 = ' DMG: ' + self.damage_die + '+' + str(dmg_bonus)
+        else:
+            text3 = ' DMG:' + self.damage_die + str(dmg_bonus)
+
+        # Render each piece of text onto separate surfaces
+        text_surface1 = font1.render(text1, True, (0,0,0))
+        text_surface2 = font2.render(text2, True, (0,0,0))
+        text_surface3 = font2.render(text3, True, (0,0,0))
+
+        # Get the dimensions of the text surfaces
+        text_width1, text_height1 = text_surface1.get_size()
+        text_width2, text_height2 = text_surface2.get_size()
+        text_width3, text_height3 = text_surface3.get_size()
+
+        #Get the dimensions of the total surface
+        total_width = max(text_width1, text_width2 + text_width3)
+        total_height = text_height1 + text_height2
+
+        combined_surface = pygame.Surface((total_width, total_height))
+        combined_surface.fill((255,255,255))
+
+        #Blit weapon info onto surface
+        combined_surface.blit(text_surface1, (0,0))
+        combined_surface.blit(text_surface2, (0,text_height1))
+        combined_surface.blit(text_surface3, (text_width2, text_height1))
+
+        if just_dimensions:
+            return combined_surface.get_size()
+
+        selected_surface = pygame.Surface((total_width, total_height))
+        selected_surface.fill((138, 138, 138))
+
+        #Blit weapon info onto surface
+        selected_surface.blit(text_surface1, (0,0))
+        selected_surface.blit(text_surface2, (0,text_height1))
+        selected_surface.blit(text_surface3, (text_width2, text_height1))
+
+        total_button = button.ButtonOnceLR(x,y,combined_surface, selected_surface, scale)
+
+        return total_button
 
             
 class Armor():
@@ -299,6 +367,46 @@ class Armor():
         total_button = button.ButtonOnce(x,y,combined_surface, selected_surface, scale)
 
         return total_button
+    
+    def get_ButtonOnceLR(self, creature, x, y, scale, just_dimensions=False):
+        font1 = pygame.font.SysFont(None, 35)
+        font2 = pygame.font.SysFont(None, 25)
+
+        text1 = self.name
+        text2 = 'AC: ' + str(self.ac) + ' '
+        text3 = self.type
+
+        text_surface1 = font1.render(text1, True, (0,0,0))
+        text_surface2 = font2.render(text2, True, (0,0,0))
+        text_surface3 = font2.render(text3, True, (0,0,0))
+
+        text_width1, text_height1 = text_surface1.get_size()
+        text_width2, text_height2 = text_surface2.get_size()
+        text_width3, text_height3 = text_surface3.get_size()
+
+        total_width = max(text_width1, text_width2 + text_width3)
+        total_height = text_height1 + text_height2
+
+        combined_surface = pygame.Surface((total_width, total_height))
+        combined_surface.fill((255,255,255))
+
+        combined_surface.blit(text_surface1, (0,0))
+        combined_surface.blit(text_surface2, (0,text_height1))
+        combined_surface.blit(text_surface3, (text_width2, text_height1))
+
+        if just_dimensions:
+            return combined_surface.get_size()
+
+        selected_surface = pygame.Surface((total_width, total_height))
+        selected_surface.fill((138, 138, 138))
+
+        selected_surface.blit(text_surface1, (0,0))
+        selected_surface.blit(text_surface2, (0,text_height1))
+        selected_surface.blit(text_surface3, (text_width2, text_height1))
+
+        total_button = button.ButtonOnceLR(x,y,combined_surface, selected_surface, scale)
+
+        return total_button
         
 class Shield():
     def __init__(self, name, ac_bonus):
@@ -372,6 +480,41 @@ class Shield():
         selected_surface.blit(text_surface2, (0,text_height1))
 
         total_button = button.ButtonOnce(x,y,combined_surface, selected_surface, scale)
+
+        return total_button
+    
+    def get_ButtonOnceLR(self, creature, x, y, scale, just_dimensions=False):
+        font1 = pygame.font.SysFont(None, 35)
+        font2 = pygame.font.SysFont(None, 25)
+
+        text1 = self.name
+        text2 = '+' + str(self.ac) + ' AC'
+
+        text_surface1 = font1.render(text1, True, (0,0,0))
+        text_surface2 = font2.render(text2, True, (0,0,0))
+
+        text_width1, text_height1 = text_surface1.get_size()
+        text_width2, text_height2 = text_surface2.get_size()
+
+        total_width = max(text_width1, text_width2)
+        total_height = text_height1 + text_height2
+
+        combined_surface = pygame.Surface((total_width, total_height))
+        combined_surface.fill((255,255,255))
+
+        combined_surface.blit(text_surface1, (0,0))
+        combined_surface.blit(text_surface2, (0,text_height1))
+
+        if just_dimensions:
+            return combined_surface.get_size()
+
+        selected_surface = pygame.Surface((total_width, total_height))
+        selected_surface.fill((138, 138, 138))
+
+        selected_surface.blit(text_surface1, (0,0))
+        selected_surface.blit(text_surface2, (0,text_height1))
+
+        total_button = button.ButtonOnceLR(x,y,combined_surface, selected_surface, scale)
 
         return total_button
 
