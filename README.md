@@ -18,11 +18,14 @@ Note that the executables will probably be a couple of versions behind the actua
 ## ROADMAP
 
 1. Add class features for the first five levels
-2. Implement spellcasting mechanics and add a couple of low level spells
-3. Populate encounters lists
-4. Add some more dungeons, develop dungeon chains
-5. Add difficulty 2 and 3 encounters
-6. Make inventory management less clunky
+2. Make weapon and spell attack selection more intuitive
+3. Expand inventory system to manage prepared spells as well
+4. Populate encounters lists
+5. Add some more dungeons, develop dungeon chains
+6. Add difficulty 2 and 3 encounters
+7. Make inventory management less clunky
+8. Create a tutorial .txt
+9. Implement game saving/loading
 
 ## CREDITS:
 
