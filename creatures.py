@@ -32,6 +32,7 @@ class Player():
 
         self.spell_slots = 0
         self.spells = []
+        self.stored_spells = []
 
         self.hp = self.max_hp
         self.alive = True

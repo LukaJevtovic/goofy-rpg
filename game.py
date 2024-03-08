@@ -645,6 +645,7 @@ while run:
                     if firebolt_button.draw(screen):
                         player.spells.append(spellbook.firebolt)
                         player.spells.append(spellbook.fire_breath)
+                        player.right_hand = equipment.dagger
                         wizard_firebolt = True
                     
                 if wizard_firebolt:
@@ -719,11 +720,13 @@ while run:
             player.dnd_class = 'fighter'
             player.max_mp = 2 + int(stat_modifier[player.wis])
             player.mp = 2 + int(stat_modifier[player.wis])
+            player.spell_slots = 1
             player.inventory = [equipment.shortsword, equipment.full_plate]
         elif wizard_selected:
             player.dnd_class = 'wizard'
             player.max_mp = 10 + int(stat_modifier[player.wis])
             player.mp = 10 + int(stat_modifier[player.wis])
+            player.spell_slots = 3
 
         if orc_selected:
             player.race = 'orc'

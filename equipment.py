@@ -543,6 +543,7 @@ class Item():
 shortsword = Weapon('Shortsword', 'dex', 0, '1d6', True, False, 0)
 longsword = Weapon('Longsword', 'str', 0, '1d8', True, False, 0)
 longbow = Weapon('Longbow', 'dex', 0, '2d6', False, True, 0)
+dagger = Weapon('Dagger', 'dex', 0, '1d4', True, False, 0)
 #firebolt = Weapon('Firebolt', 'int', 0, '1d10', False, False, 0)
 
 goblin_cleaver = Weapon('Goblin Scimitar', 'dex', 1, '2d8', True, False, 0)

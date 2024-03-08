@@ -250,6 +250,7 @@ def combat(player, ENEMIES, screen, stat_font, text_col, font, clock, run):
                     if SPELL_BUTTONS[i].draw(screen):
                         if player.mp >= player.spells[i].mana_cost:
                             selected_spell = True
+                            selected_weapon = -1
                             spell = player.spells[i]
                         else:
                             draw_text('You don\'t have enough mana!', font, text_col, log_x, log_y + 270, screen)
@@ -614,6 +615,8 @@ def inventory_menu(player, screen, clock, SCREEN_WIDTH, SCREEN_HEIGHT):
     armor_selected = False
     shield_selected = False
 
+    spell_selected = False
+
     #Left hand inventory slot
     lhand_x = 300
     lhand_y = 70
@@ -656,7 +659,7 @@ def inventory_menu(player, screen, clock, SCREEN_WIDTH, SCREEN_HEIGHT):
         #TODO: Draw spells starting from around y=250 and x=700 (like a one column list on the right side of the screen)
 
         #Draw equippable slots differently depending on which item is currently held
-        if TH_weapon_selected == False and OH_weapon_selected == False and armor_selected == False and shield_selected == False:
+        if TH_weapon_selected == False and OH_weapon_selected == False and armor_selected == False and shield_selected == False and spell_selected == False:
 
             #Draw inventory slots
             i=0
@@ -666,9 +669,46 @@ def inventory_menu(player, screen, clock, SCREEN_WIDTH, SCREEN_HEIGHT):
             dx = 20
             dy = 80
 
+            #Spell slot positions
+            spell_y = 320
+            spell_x = 760
+            spell_dy = 80
+
             draw_text('Inventory', pygame.font.SysFont(None, 50), (0,0,0), x, y-40, screen)
+            draw_text('Stored spells', pygame.font.SysFont(None, 50), (0,0,0), x, y-40-100, screen)
+            draw_text('Prepared spells', pygame.font.SysFont(None, 50), (0,0,0), spell_x-50, spell_y-40, screen)
 
             while i<12:
+
+                if i<4:
+                    pygame.draw.rect(screen, (43,66,148), pygame.Rect(scale*(x+j*(150+dx)), scale*(y-100), 150, 50), width=4)
+                    if i<len(player.stored_spells):
+                        stored_spell = player.stored_spells[i]
+                        img_width, img_height = stored_spell.get_button(scale*(x+j*(150+dx)), scale*(y-100), 1, 500, 50, 250, 1, just_dimensions=True)
+                        rescale = find_scale_factor(150 - 8, 50 - 8, img_width, img_height)
+                        stored_button = stored_spell.get_button(scale*(x+j*(150+dx) + 4), scale*(y-100 + 4), rescale, 500, 50, 250, 1)
+                        if stored_button.draw(screen):
+                            chosen_spell = stored_spell
+                            skip_index = i
+                            spell_selected = True
+
+                if i<player.spell_slots:
+                    pygame.draw.rect(screen, (43,66,148), pygame.Rect(scale*(spell_x), scale*(spell_y + i*spell_dy), 200, 50), width=4)
+
+                    if i < len(player.spells):
+                        spell = player.spells[i]
+                        img_width, img_height = spell.get_button(scale*(spell_x), scale*(spell_y + i*spell_dy), 1, 500, 50, 250, 1, just_dimensions=True)
+                        rescale = find_scale_factor(200 - 8, 50 - 8, img_width, img_height)
+                        button = spell.get_button(scale*(spell_x + 4), scale*(spell_y + i*spell_dy + 4), rescale, 500, 50, 250, 1)
+                        if button.draw(screen):
+                            if len(player.stored_spells) < 4:
+                                player.stored_spells.append(spell)
+                                player.spells.pop(i)
+
+                else:
+                    pygame.draw.rect(screen, (88,100,140), pygame.Rect(scale*(spell_x), scale*(spell_y + i*spell_dy), 200, 50), width=0)
+
+
                 if i<player.inventory_size:
                     pygame.draw.rect(screen, (74,5,44), pygame.Rect(scale*(x + j*(150+dx)), scale*y, 150,50), width=4)
 
@@ -1192,6 +1232,74 @@ def inventory_menu(player, screen, clock, SCREEN_WIDTH, SCREEN_HEIGHT):
                 button_armor = player.armor.get_ButtonOnceLR(player, scale*(armor_x + 5), scale*(armor_y + 5 + 30), rescale)
                 button_armor.clicked = True
                 button_armor.draw(screen)
+
+
+        #Spell selected
+        if spell_selected:
+
+            big_button = chosen_spell.get_button(50, 250, 3, 500, 50, 600, 1)
+            if big_button.draw(screen):
+                spell_selected = False
+
+            #Draw inventory slots
+            i=0
+            j=0
+            x=50
+            y=580
+            dx = 20
+            dy = 80
+
+            #Spell slot positions
+            spell_y = 320
+            spell_x = 760
+            spell_dy = 80
+
+            while i<6:
+
+                if i<4:
+                    pygame.draw.rect(screen, (43,66,148), pygame.Rect(scale*(x+i*(150+dx)), scale*(y-100), 150, 50), width=4)
+                    if i<len(player.stored_spells) and i != skip_index:
+                        stored_spell = player.stored_spells[i]
+                        img_width, img_height = stored_spell.get_button(scale*(x+i*(150+dx)), scale*(y-100), 1, 500, 50, 250, 1, just_dimensions=True)
+                        rescale = find_scale_factor(150 - 8, 50 - 8, img_width, img_height)
+                        stored_button = stored_spell.get_button(scale*(x+i*(150+dx) + 4), scale*(y-100 + 4), rescale, 500, 50, 250, 1)
+                        if stored_button.draw(screen):
+                            chosen_spell = stored_spell
+                            skip_index = i
+                            spell_selected = True
+
+                if i<player.spell_slots:
+
+                    if i < len(player.spells):
+
+                        pygame.draw.rect(screen, (43,66,148), pygame.Rect(scale*(spell_x), scale*(spell_y + i*spell_dy), 200, 50), width=4)
+
+                        spell = player.spells[i]
+                        img_width, img_height = spell.get_button(scale*(spell_x), scale*(spell_y + i*spell_dy), 1, 500, 50, 250, 1, just_dimensions=True)
+                        rescale = find_scale_factor(200 - 8, 50 - 8, img_width, img_height)
+                        button = spell.get_button(scale*(spell_x + 4), scale*(spell_y + i*spell_dy + 4), rescale, 500, 50, 250, 1)
+                        button.draw(screen)
+
+                    elif i == len(player.spells):
+                        local_rect = pygame.Rect(scale*(spell_x), scale*(spell_y + i*spell_dy), 200, 50)
+                        pygame.draw.rect(screen, (43,66,148), local_rect, width=8)
+
+                    else:
+                        pygame.draw.rect(screen, (43,66,148), pygame.Rect(scale*(spell_x), scale*(spell_y + i*spell_dy), 200, 50), width=4)
+
+                    
+
+                else:
+                    pygame.draw.rect(screen, (88,100,140), pygame.Rect(scale*(spell_x), scale*(spell_y + i*spell_dy), 200, 50), width=0)
+                
+                i+=1
+
+            if local_rect.collidepoint(mouse_x, mouse_y) and pygame.mouse.get_pressed()[0] == 1:
+                player.spells.append(chosen_spell)
+                player.stored_spells.pop(skip_index)
+                pygame.mouse.set_pos([500,400])
+                spell_selected = False
+        
         
         pygame.display.update()
         clock.tick(60)

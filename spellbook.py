@@ -19,7 +19,7 @@ class Spell():
     
     def get_button(self, x, y, scale, max_width, desc_x, desc_y, desc_scale, just_dimensions=False):
         font1 = pygame.font.SysFont(None, 35)
-        font2 = pygame.font.SysFont(None, 20)
+        font2 = pygame.font.SysFont(None, 25)
 
         text1 = self.name
         text2 = self.description
