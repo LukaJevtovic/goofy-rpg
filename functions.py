@@ -447,9 +447,9 @@ def leveling_menu(player, font, color, screen, clock):
                 clock.tick(60)
                 pygame.time.wait(1000)
             elif player.dnd_class == 'wizard':
-                draw_text('MP: ' + str(player.max_mp) + ' ->' + ' ' + str(player.max_mp + 5 + int(stat_modifier[player.wis])), font, color, 100, 300, screen)
-                player.max_mp+=(5+ int(stat_modifier[player.wis]))
-                player.mp+=(5+ int(stat_modifier[player.wis]))
+                draw_text('MP: ' + str(player.max_mp) + ' ->' + ' ' + str(player.max_mp + 10 + int(stat_modifier[player.wis])), font, color, 100, 300, screen)
+                player.max_mp+=(10+ int(stat_modifier[player.wis]))
+                player.mp+=(10+ int(stat_modifier[player.wis]))
                 pygame.display.update()
                 clock.tick(60)
                 pygame.time.wait(1000)

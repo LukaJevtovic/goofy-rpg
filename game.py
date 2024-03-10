@@ -233,7 +233,7 @@ while run:
     if not start_menu:
         # DUNGEONS --------------------------------------------------------------------------------------------------------------
         DUNGEON_IMGS = [pygame.image.load('Dungeons/intro_dungeon.jpg').convert_alpha()]
-        DUNGEONS = [dungeons.Dungeon(DUNGEON_IMGS[0], 620, 400, 0.25, dungeons.DUNGEON_POSITIONS[0])]
+        DUNGEONS = [dungeons.Dungeon(DUNGEON_IMGS[0], 340, 100, 0.25, dungeons.EVENT_POS[0])]
 
     while stat_select and run:
 
@@ -432,12 +432,17 @@ while run:
                 STATS = STATS_INIT[:]
             
             if class_button.draw(screen):
-                class_select = True
-                race_select = False
-                fighter_selected = False
-                wizard_selected = False
-                [player.str, player.dex, player.con, player.int, player.wis, player.cha] = STATS
-                player.hp = 0 + int(stat_modifier[player.con])
+                if human_selected or elf_selected or orc_selected:
+                    class_select = True
+                    race_select = False
+                    fighter_selected = False
+                    wizard_selected = False
+                    [player.str, player.dex, player.con, player.int, player.wis, player.cha] = STATS
+                    player.hp = 0 + int(stat_modifier[player.con])
+                else:
+                    functions.draw_text('Please choose a race before proceeding', font, (0,0,0), 50, 350, screen)
+                    pygame.display.update()
+                    pygame.time.wait(1000)
                 
 
         #Pause Menu
@@ -524,11 +529,16 @@ while run:
                 [player.str, player.dex, player.con, player.int, player.wis, player.cha] = [8,8,8,8,8,8]
                 player.hp = 0
             if equipment_button.draw(screen):
-                class_select = False
-                equipment_select = True
-                fighter_longsword = False
-                fighter_longbow = False
-                wizard_firebolt = False
+                if fighter_selected or wizard_selected:
+                    class_select = False
+                    equipment_select = True
+                    fighter_longsword = False
+                    fighter_longbow = False
+                    wizard_firebolt = False
+                else:
+                    functions.draw_text('Please choose a class before proceeding', font, (0,0,0), 50, 350, screen)
+                    pygame.display.update()
+                    pygame.time.wait(1000)
 
 
         #Pause Menu
@@ -665,9 +675,6 @@ while run:
                 fighter_longsword = False
                 wizard_firebolt = False
 
-            if adventure_button.draw(screen):
-                equipment_select = False
-                adventure1 = True
             
             if not god_mode:
                 if god_mode_button.draw(screen):
@@ -678,6 +685,15 @@ while run:
                 if god_mode_selected_button.draw(screen):
                     god_mode = False
                     player.hp -= 100
+
+            if adventure_button.draw(screen):
+                if fighter_longbow or fighter_longsword or wizard_firebolt:
+                    equipment_select = False
+                    adventure1 = True
+                else:
+                    functions.draw_text('Please choose your equipment before proceeding', font, (0,0,0), 50, 400, screen)
+                    pygame.display.update()
+                    pygame.time.wait(1000)
 
         #Pause Menu
         if game_paused:
