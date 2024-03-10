@@ -233,7 +233,7 @@ while run:
     if not start_menu:
         # DUNGEONS --------------------------------------------------------------------------------------------------------------
         DUNGEON_IMGS = [pygame.image.load('Dungeons/intro_dungeon.jpg').convert_alpha()]
-        DUNGEONS = [dungeons.Dungeon(DUNGEON_IMGS[0], 340, 100, 0.25, dungeons.EVENT_POS[0])]
+        DUNGEONS = [dungeons.Dungeon(DUNGEON_IMGS[0], 340, 100, 1, 1)]
 
     while stat_select and run:
 

@@ -29,24 +29,40 @@ class combat_regular():
         self.clicked = False
         self.completed = False
 
+        self.discovered = False
+
     def draw(self, surface):
+        if self.discovered:
+            if not self.completed:
+                image_name = 'Pictures/combat' + str(self.difficulty) + '.png'
+                image = pygame.image.load(image_name).convert_alpha()
+                width = image.get_width()
+                height = image.get_height()
+                self.image = pygame.transform.scale(image, (int(width*self.scale), int(height*self.scale)))
+            elif self.completed:
+                image_name = 'Pictures/combat' + str(self.difficulty) + '_completed.png'
+                image = pygame.image.load(image_name).convert_alpha()
+                width = image.get_width()
+                height = image.get_height()
+                self.image = pygame.transform.scale(image, (int(width*self.scale), int(height*self.scale)))
 
+            if not self.completed:
+                if pygame.mouse.get_pressed()[0] == 0:
+                    self.clicked = False
+                position = pygame.mouse.get_pos()
 
-        if not self.completed:
-            if pygame.mouse.get_pressed()[0] == 0:
-                self.clicked = False
-            position = pygame.mouse.get_pos()
-
-            if self.rect.collidepoint(position):
-                if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
-                    self.clicked = True
-                    self.completed = True
-                    image_name = 'Pictures/combat' + str(self.difficulty) + '_completed.png'
-                    image = pygame.image.load(image_name).convert_alpha()
-                    width = image.get_width()
-                    height = image.get_height()
-                    self.image = pygame.transform.scale(image, (int(width*self.scale), int(height*self.scale)))
-                    return True
+                if self.rect.collidepoint(position):
+                    if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                        self.clicked = True
+                        self.completed = True
+                        
+                        return True
+        else:
+            image_name = 'Pictures/unknown_encounter.png'
+            image = pygame.image.load(image_name).convert_alpha()
+            width = image.get_width()
+            height = image.get_height()
+            self.image = pygame.transform.scale(image, (int(width*self.scale), int(height*self.scale)))
                 
         surface.blit(self.image, (self.rect.x, self.rect.y))
 
@@ -115,7 +131,7 @@ class combat_boss():
         image = pygame.image.load(image_name).convert_alpha()
         width = image.get_width()
         height = image.get_height()
-        self.image = pygame.transform.scale(image, (int(width*scale), int(height*scale)))
+        self.image = pygame.transform.scale(image, (int(width*self.scale), int(height*self.scale)))
 
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
@@ -123,24 +139,41 @@ class combat_boss():
         self.clicked = False
         self.completed = False
 
+        self.discovered = False
+
     def draw(self, surface):
+        if self.discovered:
+            if not self.completed:
+                image_name = 'Pictures/combat_boss.png'
+                image = pygame.image.load(image_name).convert_alpha()
+                width = image.get_width()
+                height = image.get_height()
+                self.image = pygame.transform.scale(image, (int(width*self.scale), int(height*self.scale)))
+            elif self.completed:
+                image_name = 'Pictures/combat_boss_completed.png'
+                image = pygame.image.load(image_name).convert_alpha()
+                width = image.get_width()
+                height = image.get_height()
+                self.image = pygame.transform.scale(image, (int(width*self.scale), int(height*self.scale)))
 
+            if not self.completed:
+                if pygame.mouse.get_pressed()[0] == 0:
+                    self.clicked = False
+                position = pygame.mouse.get_pos()
 
-        if not self.completed:
-            if pygame.mouse.get_pressed()[0] == 0:
-                self.clicked = False
-            position = pygame.mouse.get_pos()
-
-            if self.rect.collidepoint(position):
-                if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
-                    self.clicked = True
-                    self.completed = True
-                    image_name = 'Pictures/combat_boss_completed.png'
-                    image = pygame.image.load(image_name).convert_alpha()
-                    width = image.get_width()
-                    height = image.get_height()
-                    self.image = pygame.transform.scale(image, (int(width*self.scale), int(height*self.scale)))
-                    return True
+                if self.rect.collidepoint(position):
+                    if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                        self.clicked = True
+                        self.completed = True
+                        
+                        return True
+                    
+        else:
+            image_name = 'Pictures/unknown_encounter.png'
+            image = pygame.image.load(image_name).convert_alpha()
+            width = image.get_width()
+            height = image.get_height()
+            self.image = pygame.transform.scale(image, (int(width*self.scale), int(height*self.scale)))
 
 
         surface.blit(self.image, (self.rect.x, self.rect.y))
@@ -207,7 +240,7 @@ class event_regular():
         image = pygame.image.load(image_name).convert_alpha()
         width = image.get_width()
         height = image.get_height()
-        self.image = pygame.transform.scale(image, (int(width*scale), int(height*scale)))
+        self.image = pygame.transform.scale(image, (int(width*self.scale), int(height*self.scale)))
 
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
@@ -215,24 +248,41 @@ class event_regular():
         self.clicked = False
         self.completed = False
 
+        self.discovered = False
+
     def draw(self, surface):
+        if self.discovered:
+            if not self.completed:
+                image_name = 'Pictures/event.png'
+                image = pygame.image.load(image_name).convert_alpha()
+                width = image.get_width()
+                height = image.get_height()
+                self.image = pygame.transform.scale(image, (int(width*self.scale), int(height*self.scale)))
 
+            elif self.completed:
+                image_name = 'Pictures/event_completed.png'
+                image = pygame.image.load(image_name).convert_alpha()
+                width = image.get_width()
+                height = image.get_height()
+                self.image = pygame.transform.scale(image, (int(width*self.scale), int(height*self.scale)))
 
-        if not self.completed:
-            if pygame.mouse.get_pressed()[0] == 0:
-                self.clicked = False
-            position = pygame.mouse.get_pos()
+            if not self.completed:
+                if pygame.mouse.get_pressed()[0] == 0:
+                    self.clicked = False
+                position = pygame.mouse.get_pos()
 
-            if self.rect.collidepoint(position):
-                if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
-                    self.clicked = True
-                    self.completed = True
-                    image_name = 'Pictures/event_completed.png'
-                    image = pygame.image.load(image_name).convert_alpha()
-                    width = image.get_width()
-                    height = image.get_height()
-                    self.image = pygame.transform.scale(image, (int(width*self.scale), int(height*self.scale)))
-                    return True
+                if self.rect.collidepoint(position):
+                    if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                        self.clicked = True
+                        self.completed = True
+                        return True
+                    
+        else:
+            image_name = 'Pictures/unknown_encounter.png'
+            image = pygame.image.load(image_name).convert_alpha()
+            width = image.get_width()
+            height = image.get_height()
+            self.image = pygame.transform.scale(image, (int(width*self.scale), int(height*self.scale)))
 
 
         surface.blit(self.image, (self.rect.x, self.rect.y))
