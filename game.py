@@ -232,8 +232,7 @@ while run:
 
     if not start_menu:
         # DUNGEONS --------------------------------------------------------------------------------------------------------------
-        DUNGEON_IMGS = [pygame.image.load('Dungeons/intro_dungeon.jpg').convert_alpha()]
-        DUNGEONS = [dungeons.Dungeon(DUNGEON_IMGS[0], 340, 100, 1, 1)]
+        DUNGEONS = [dungeons.Dungeon(340, 100, 1, 1), dungeons.Dungeon(340, 100, 1, 2)]
 
     while stat_select and run:
 
@@ -738,6 +737,8 @@ while run:
             player.mp = 2 + int(stat_modifier[player.wis])
             player.spell_slots = 1
             player.inventory = [equipment.shortsword, equipment.full_plate]
+            player.lvl = 2
+            player.action_surge = 2
         elif wizard_selected:
             player.dnd_class = 'wizard'
             player.max_mp = 10 + int(stat_modifier[player.wis])
@@ -829,10 +830,10 @@ while run:
             functions.draw_text(player.armor.name, stat_font, text_col, 50, 340 + j*dy, screen)
 
 
-        DUNGEONS[0].draw(screen, player, stat_font, text_col, font, clock, run)
-            #pygame.time.wait(2000)
-            #dungeon2 = True
-            #dungeon1 = False
+        if DUNGEONS[0].draw(screen, player, stat_font, text_col, font, clock, run):
+            if dungeon_button.draw(screen):
+                dungeon1 = False
+                dungeon2 = True
 
 
         #Pause Menu
@@ -868,18 +869,74 @@ while run:
         pygame.display.update()
         clock.tick(60)
 
+        if dungeon1 == False and dungeon2 == True:
+            player.hp = player.max_hp
+            player.mp = player.max_mp
+            player.scrying_eye = player.max_scrying_eye
+            player.action_surge = player.max_action_surge
+
 
     while dungeon2 and run:
         screen.fill((229,203,186))
 
-        functions.draw_text('Work in progress', font, text_col, 100, 100, screen)
+        if not player.alive:
+            dungeon1 = False
+            start_menu = True
 
+
+        #Player info
+        functions.health_bar(player, 20, 20, 0, (255,255,255), screen)
+        functions.xp_bar(player, 20, 20, (255,255,255), screen)
+        functions.mana_bar(player, 20, 70, (255,255,255), screen)
+        functions.draw_text('AC: ' + str(player.ac()), font, text_col, 50, 260, screen)
+        functions.draw_text('Current equipment:', stat_font, text_col, 50, 300, screen)
+        functions.draw_text('Gold: ' + str(player.gold), pygame.font.SysFont(None, 30), (0,0,0), 50, 320, screen)
+        dy = 20
+        j=0
+        if player.right_hand != None:
+            functions.draw_text(player.right_hand.name, stat_font, text_col, 50, 340 + j*dy, screen)
+            j+=1
+            
+        if player.left_hand != None:
+            functions.draw_text(player.left_hand.name, stat_font, text_col, 50, 340 + j*dy, screen)
+            j+=1
+
+        if player.armor != None:
+            functions.draw_text(player.armor.name, stat_font, text_col, 50, 340 + j*dy, screen)
+
+
+        if DUNGEONS[1].draw(screen, player, stat_font, text_col, font, clock, run):
+            if dungeon_button:
+                dungeon1 = False
+                dungeon2 = True
+
+
+        #Pause Menu
+        if game_paused:
+            functions.draw_text("Game is paused. Press ESC to unpause.", font, text_col, 100, 30, screen)
+            if resume_button.draw(screen):
+                game_paused = False
+            if quit_button.draw(screen):
+                run = False
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        game_paused = False
+                if event.type == pygame.QUIT:
+                    run = False
+
+        if player.xp >= player.xp_to_lvlup():
+            if lvlup_icon_button.draw(screen):
+                functions.leveling_menu(player, font, (0,0,0), screen, clock)
+        
         for event in pygame.event.get():
 
             #Pause check
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     game_paused = True
+                if event.key == pygame.K_i:
+                    functions.inventory_menu(player, screen, clock, SCREEN_WIDTH, SCREEN_HEIGHT)
             #Quit check
             if event.type == pygame.QUIT:
                 run = False

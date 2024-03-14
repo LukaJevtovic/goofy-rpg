@@ -16,6 +16,11 @@ class Player():
         self.dnd_class = ''
         self.race = ''
 
+        self.max_action_surge = 0
+        self.action_surge = 0
+        self.scrying_eye = 0
+        self.max_scrying_eye = 0
+
         self.str = 8
         self.dex = 8
         self.con = 8
@@ -82,6 +87,8 @@ class Player():
             self.hp = 0
             dead = True
             self.alive = False
+
+    
         
         return dead
     

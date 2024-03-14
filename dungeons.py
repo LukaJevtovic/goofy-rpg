@@ -1,11 +1,12 @@
 import pygame
 import functions
 import encounters
+import button
 import numpy as np
 
 
 class Dungeon():
-    def __init__(self, image, x, y, scale, level):
+    def __init__(self, x, y, scale, level):
         self.EVENTS = []
         self.completeness = []
         DIFFICULTIES = []
@@ -72,19 +73,33 @@ class Dungeon():
             i+=1
         
         self.EVENTS[0].discovered = True
+        self.EVENTS[0].clickable = True
 
         self.EVENT_POS = EVENT_POS
 
-
-        width = image.get_width()
-        height = image.get_height()
-        self.image = pygame.transform.scale(image, (int(width*scale), int(height*scale)))
-        self.rect = self.image.get_rect()
-        self.rect.topleft = (x,y)
+        #Scry button
+        scry_img = pygame.image.load('Pictures/scry.png').convert_alpha()
+        self.scry_button = button.ButtonSlow(50, 400, scry_img, 0.35)
+        self.scrying_eye_cost = 3
 
     def draw(self, screen, player, stat_font, text_col, font, clock, run):
+
+        if player.dnd_class == 'wizard' and player.lvl>1 and player.scrying_eye >0 and player.mp > self.scrying_eye_cost:
+            functions.draw_text('Scrying charges left: ' + str(player.scrying_eye), stat_font, text_col, 50, 500, screen)
+            functions.draw_text('Scrying eye cost: ' + str(self.scrying_eye_cost), stat_font, text_col, 50, 530, screen)
+
+            if self.scry_button.draw(screen):
+
+                player.scrying_eye -= 1
+                player.mp -= self.scrying_eye_cost
+                self.scrying_eye_cost += 5
+
+                for event in self.EVENTS:
+                    if event.discovered != True:
+                        event.discovered = True
+                        break
         
-        #screen.blit(self.image, (self.rect.x, self.rect.y))
+        
 
         i = 0
         while i < len(self.EVENTS):
@@ -95,8 +110,10 @@ class Dungeon():
             if self.EVENTS[i].draw(screen):
                 self.EVENTS[i].begin(player, screen, stat_font, text_col, font, clock, run)
                 self.completeness[i] = True
+                self.scrying_eye_cost = 3
                 if i != len(self.EVENTS)-1:
                     self.EVENTS[i+1].discovered = True
+                    self.EVENTS[i+1].clickable = True
             
             i+=1
 

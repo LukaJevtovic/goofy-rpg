@@ -87,6 +87,14 @@ def combat(player, ENEMIES, screen, stat_font, text_col, font, clock, run):
     attack_img = pygame.image.load('Pictures/attack.png').convert_alpha()
     attack_button = button.Button(350,500, attack_img, 0.4)
 
+    #Action surge button
+    as_image = pygame.image.load('Pictures/action_surge.png').convert_alpha()
+    as_button = button.ButtonSlow(750, 500, as_image, 0.35)
+
+    #End turn button
+    end_image = pygame.image.load('Pictures/end_turn.png').convert_alpha()
+    end_turn_button = button.ButtonSlow(750,600, end_image, 0.35)
+
     #Initiative
     player_initiative = np.random.randint(1, 21) + int(stat_modifier[player.dex])
 
@@ -104,7 +112,7 @@ def combat(player, ENEMIES, screen, stat_font, text_col, font, clock, run):
     log_x = 20
     log_y = 110
     #Position of initiative lines
-    init_x = 600
+    init_x = 500
     init_y = 50
 
     WPN_BUTTONS = []
@@ -312,7 +320,40 @@ def combat(player, ENEMIES, screen, stat_font, text_col, font, clock, run):
                     draw_text('You miss!',font, text_col, log_x, log_y + 30, screen)
                     pygame.display.update()
                     pygame.time.wait(2500)
+
+                action_surging = False
+                continuing = False
+
+                if player.dnd_class == 'fighter' and player.action_surge != 0 and len(sorted_initiatives) > 1:
+                    draw_text('Action surges left: ' + str(player.action_surge), stat_font, text_col, 750, 700, screen)
                     
+                    while not action_surging and not continuing:
+
+                        for event in pygame.event.get():
+
+                            #Pause check
+                            if event.type == pygame.KEYDOWN:
+                                if event.key == pygame.K_ESCAPE:
+                                    game_paused = True
+                            #Quit check
+                            if event.type == pygame.QUIT:
+                                run = False
+                                quitting = True
+
+                        if as_button.draw(screen):
+                            action_surging = True
+                            player.action_surge -= 1
+
+                        if end_turn_button.draw(screen):
+                            continuing = True
+
+                        
+                        pygame.display.update()
+                        clock.tick(60)
+
+                if action_surging:
+                    continue
+                               
                 sorted_initiatives.append(sorted_initiatives.pop(0))
 
             elif selected_spell:
@@ -320,10 +361,10 @@ def combat(player, ENEMIES, screen, stat_font, text_col, font, clock, run):
 
 
 
-
+        
         #Enemy turn
             
-        else:
+        elif sorted_initiatives[0][1].name != player.name:
             enemy = sorted_initiatives[0][1]
 
             dice_sound()
@@ -369,6 +410,8 @@ def leveling_menu(player, font, color, screen, clock):
 
     continue_img = pygame.image.load('Pictures/continue.png').convert_alpha()
     continue_button = button.ButtonSlow(600, 600, continue_img, 0.3)
+
+    stat_font = pygame.font.Font(None, 30)
 
     while leveling and not quitting:
 
@@ -456,6 +499,20 @@ def leveling_menu(player, font, color, screen, clock):
 
         draw_text('HP: ' + str(old_hp) + ' ->' + ' ' + str(player.max_hp), font, color, 100, 200, screen)
         draw_text('MP: ' + str(old_mp) + ' ->' + ' ' + str(player.max_mp), font, color, 100, 300, screen)
+
+        #Levelup 1 -> 2
+
+        if player.lvl == 2:
+            if player.dnd_class == 'fighter':
+                text_wrap('You now gain the ability to action surge. After making an attack with a weapon, you can choose to take another turn immediately. You can do this two times per dungeon, and this maximum increases by one for every following level you gain.',
+                        stat_font, (0,0,0), screen, 350, 100, 600)
+                player.max_action_surge = 2
+                player.action_surge = 2
+            elif player.dnd_class == 'wizard':
+                text_wrap('You can now ritually cast the scrying eye spell. This spell reveals the furthest undiscovered row of dungeon rooms. The cost starts at 3 mana, and it increases by 5 mana for every successive row after the first. You can use this feature once per dungeon, and you can use it an additional time for every two levels afterwards.',
+                        stat_font, (0,0,0), screen, 350, 100, 600)
+                player.max_scrying_eye = 2
+                player.scrying_eye = 2
 
         if continue_button.draw(screen):
             quitting = True

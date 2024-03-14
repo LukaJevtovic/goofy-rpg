@@ -30,6 +30,7 @@ class combat_regular():
         self.completed = False
 
         self.discovered = False
+        self.clickable = False
 
     def draw(self, surface):
         if self.discovered:
@@ -46,7 +47,7 @@ class combat_regular():
                 height = image.get_height()
                 self.image = pygame.transform.scale(image, (int(width*self.scale), int(height*self.scale)))
 
-            if not self.completed:
+            if not self.completed and self.clickable:
                 if pygame.mouse.get_pressed()[0] == 0:
                     self.clicked = False
                 position = pygame.mouse.get_pos()
@@ -76,6 +77,23 @@ class combat_regular():
             else:
                 j=0
             ENEMIES = COMBAT1[j]
+
+        #TODO: Add separate combat encounters for higher difficulties
+            
+        elif self.difficulty == 2:
+            if len(COMBAT1)>1:
+                j = np.random.randint(0, len(COMBAT1)-1)
+            else:
+                j=0
+            ENEMIES = COMBAT1[j]
+
+        elif self.difficulty == 3:
+            if len(COMBAT1)>1:
+                j = np.random.randint(0, len(COMBAT1)-1)
+            else:
+                j=0
+            ENEMIES = COMBAT1[j]
+
 
         functions.combat(player, ENEMIES, screen, stat_font, text_col, font, clock, run)
 
@@ -140,6 +158,7 @@ class combat_boss():
         self.completed = False
 
         self.discovered = False
+        self.clickable = False
 
     def draw(self, surface):
         if self.discovered:
@@ -156,7 +175,7 @@ class combat_boss():
                 height = image.get_height()
                 self.image = pygame.transform.scale(image, (int(width*self.scale), int(height*self.scale)))
 
-            if not self.completed:
+            if not self.completed and self.clickable:
                 if pygame.mouse.get_pressed()[0] == 0:
                     self.clicked = False
                 position = pygame.mouse.get_pos()
@@ -249,6 +268,7 @@ class event_regular():
         self.completed = False
 
         self.discovered = False
+        self.clickable = False
 
     def draw(self, surface):
         if self.discovered:
@@ -266,7 +286,7 @@ class event_regular():
                 height = image.get_height()
                 self.image = pygame.transform.scale(image, (int(width*self.scale), int(height*self.scale)))
 
-            if not self.completed:
+            if not self.completed and self.clickable:
                 if pygame.mouse.get_pressed()[0] == 0:
                     self.clicked = False
                 position = pygame.mouse.get_pos()
@@ -310,9 +330,14 @@ class event_regular():
 
 
 def initiate_encounter_lists():
-    COMBAT1 = [[creatures.basic_enemy(*creatures.goblin_stats)]]
+    COMBAT1 = [[creatures.basic_enemy(*creatures.goblin_stats)],
+               [creatures.basic_enemy('Constrictor snake', 50, 13, 12, 15, 14, 12, 1, 10, 3, equipment.shortsword, 2)],
+               [creatures.basic_enemy('Flying sword', 50, 14, 14, 12, 15, 11, 1, 5, 1, equipment.Weapon('attack', 'str', 0, '1d4', True, False, 0), 2)],
+               [creatures.basic_enemy('Giant rat', 40, 7, 12, 7, 15, 11, 2, 10, 4, equipment.dagger, 2), creatures.basic_enemy('Badger', 10, 3, 10, 4, 11, 12, 2, 12, 5, equipment.Weapon('Bite', 'dex', 0, '1d2', True, False, 0), 2)]]
 
-    COMBAT_BOSS = [[creatures.basic_enemy(*creatures.goblin_stats), creatures.basic_enemy(*creatures.goblin_stats)], [creatures.basic_enemy('Goblin brute', 100, 18, 9, 16, 8, 16, 8, 8, 8, equipment.longsword, 4)]]
+    COMBAT_BOSS = [[creatures.basic_enemy(*creatures.goblin_stats), creatures.basic_enemy(*creatures.goblin_stats)],
+                   [creatures.basic_enemy('Goblin brute', 100, 18, 9, 16, 8, 16, 8, 8, 8, equipment.longsword, 4)],
+                   [creatures.basic_enemy('Black bear', 100, 19, 11, 15, 10, 14, 2, 12, 7, equipment.Weapon('Claws', 'str', 0, '2d4', True, True, 0), 1)]]
 
     return COMBAT1, COMBAT_BOSS
 
